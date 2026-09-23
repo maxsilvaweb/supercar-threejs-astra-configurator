@@ -221,7 +221,7 @@ export function GarageApp() {
                         className={cn(
                           "w-fit capitalize",
                           car.brand === "ferrari" && "brand-pill-ferrari",
-                          car.brand === "lamborghini" && "brand-pill-lamborghini",
+                          car.brand === "porsche" && "brand-pill-porsche",
                         )}
                       >
                         {car.brand}
@@ -231,7 +231,9 @@ export function GarageApp() {
                       ) : null}
                     </div>
                     <CardTitle className="text-xl text-white">{car.name}</CardTitle>
-                    <CardDescription className="text-white/80">{car.tagline}</CardDescription>
+                    {car.tagline ? (
+                      <CardDescription className="text-white/80">{car.tagline}</CardDescription>
+                    ) : null}
                   </CardHeader>
 
                   <CardFooter className="justify-between">

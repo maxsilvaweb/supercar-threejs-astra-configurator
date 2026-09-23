@@ -25,8 +25,12 @@ export function carSoundUrl(slug: string, clip = `${slug}.mp3`) {
   return `/sounds/${slug}/${file}`;
 }
 
+const previewVersion: Record<string, number> = {
+  "porsche-gt4": 2,
+};
+
 export function carPreviewUrl(slug: string) {
-  return `/ui/previews/${slug}.jpg?v=1`;
+  return `/ui/previews/${slug}.jpg?v=${previewVersion[slug] ?? 1}`;
 }
 
 export const GARAGE_STORAGE_KEY = "car-modeler-garage";
@@ -35,7 +39,7 @@ export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
-export const LAMBORGHINI_AVENTADOR_MODEL = "/models/lamborghini-aventador/lamborghini-aventador.glb?v=fbx1";
+export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=1";
 export const RIM_MODEL = "/models/rim/rim.glb?v=1";
 export const STUDIO_GARAGE_MODEL = "/models/studio-garage/studio-garage.glb?v=1";
 export const CONFIG_GARAGE_MODEL = "/models/config-garage/config-garage.glb?v=1";

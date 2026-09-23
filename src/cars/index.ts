@@ -1,9 +1,9 @@
 import type { CarDefinition } from "../lib/schema";
 import { ferrariEnzo } from "./ferrari-enzo";
 import { ferrariSf25 } from "./ferrari-sf25";
-import { lamborghiniAventador } from "./lamborghini-aventador";
+import { porscheGt4 } from "./porsche-gt4";
 
-const cars: CarDefinition[] = [ferrariSf25, ferrariEnzo, lamborghiniAventador];
+const cars: CarDefinition[] = [ferrariSf25, ferrariEnzo, porscheGt4];
 
 export function listCars() {
   return cars.filter((car) => !car.hidden);

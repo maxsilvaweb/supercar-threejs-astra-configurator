@@ -311,7 +311,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
             className={cn(
               "w-fit capitalize",
               car.brand === "ferrari" && "brand-pill-ferrari",
-              car.brand === "lamborghini" && "brand-pill-lamborghini",
+              car.brand === "porsche" && "brand-pill-porsche",
             )}
           >
             {car.brand}
@@ -364,6 +364,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
         <section className={cn("grid gap-4", state.applying && "pointer-events-none opacity-55")}>
           {sections
             .filter((item) => item.id !== "options" || car.aeroParts.length > 0)
+            .filter((item) => item.id !== "wheels" || car.hideWhenAftermarket)
             .map((item) => {
             const active = section === item.id;
             const designLocked = interior && designSections.has(item.id);

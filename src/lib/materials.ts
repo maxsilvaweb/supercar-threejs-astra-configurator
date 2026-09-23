@@ -340,7 +340,7 @@ function tintExisting(material: Material, color: string, finish: FinishId) {
 }
 
 function styleLocked(name: string) {
-  if (/mirror/i.test(name)) {
+  if (/mirror|^chrome/i.test(name)) {
     return new MeshPhysicalMaterial({
       color: "#c5cdd6",
       metalness: 1,
@@ -398,23 +398,6 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
     const current = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     const next = current.map((material) => {
       const matName = material?.name || "";
-      if (car.slug === "lamborghini-aventador" && /AventadorTire/i.test(matName)) {
-        return createRubberMaterial(matName);
-      }
-      if (car.slug === "lamborghini-aventador" && /AventadorRim/i.test(matName)) {
-        const rim = createRimMaterial(build.rimColor);
-        rim.name = matName;
-        return rim;
-      }
-      if (car.slug === "lamborghini-aventador" && /AventadorTrim/i.test(matName)) {
-        return new MeshPhysicalMaterial({
-          name: matName,
-          color: "#111214",
-          roughness: 0.55,
-          metalness: 0.18,
-          envMapIntensity: 0.7,
-        });
-      }
       if (car.slug === "ferrari-enzo" && isTyreRubber(matName)) {
         return createRubberMaterial(matName);
       }
@@ -424,8 +407,11 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
       if (car.slug === "ferrari-enzo" && /logo perfil/i.test(matName)) {
         return hideMaterial(matName);
       }
+      if (car.slug === "porsche-gt4" && isTyreRubber(matName)) {
+        return createRubberMaterial(matName);
+      }
       if (isGlass(matName)) {
-        return createGlassMaterial(matName, car.slug === "lamborghini-aventador");
+        return createGlassMaterial(matName);
       }
 
       const locked = firstMatch(mesh, matName, car.locked || []);
@@ -447,12 +433,6 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
             car.defaultPaints[group.id] || "#FF2800",
             /FrontWing|Nose|RearWing|RearFlap|DRS/i.test(mesh.name),
           );
-        }
-        if (car.slug === "lamborghini-aventador") {
-          if (!/AventadorBody/i.test(matName)) return material;
-          const painted = createPaintMaterial(color, build.finish);
-          painted.name = matName;
-          return painted;
         }
         if (hasMaps(material) && build.finish !== "carbon") {
           return tintExisting(material, color, build.finish);

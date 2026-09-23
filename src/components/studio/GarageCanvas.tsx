@@ -34,7 +34,7 @@ const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBui
 const bays = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
   { slug: "ferrari-enzo", empty: false, reserved: false, shift: 0 },
-  { slug: "lamborghini-aventador", empty: true, reserved: true, shift: -2.1 },
+  { slug: "porsche-gt4", empty: false, reserved: false, shift: -2.1 },
   { slug: "reserve-1", empty: true, reserved: true, shift: 0 },
 ].map((bay, index, list) => {
   const x = LINE.x + (index - (list.length - 1) / 2) * BAY_SPACING + bay.shift;
