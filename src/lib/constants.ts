@@ -25,6 +25,7 @@ export function carPreviewUrl(slug: string) {
 
 export const GARAGE_STORAGE_KEY = "car-modeler-garage";
 export const MUTE_STORAGE_KEY = "car-modeler-muted";
+export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";

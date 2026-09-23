@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronsLeft, ChevronsRight, PanelLeft, RotateCw, Save } from "lucide-react";
+import { ArrowLeft, Ban, ChevronsLeft, ChevronsRight, PanelLeft, RotateCw, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { paintSwatches, rimSwatches } from "../../lib/colors";
 import { preloadSound } from "../../lib/play-one-shot-sound";
@@ -345,11 +345,13 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
           <Button
             variant="secondary"
             size="sm"
-            className="btn-chrome"
+            className="btn-chrome disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-55"
             aria-label="Save"
+            disabled
             onClick={() => state.saveBuild(window.carModelerCapture?.())}
           >
-            <Save data-icon="inline-start" />
+            <Save data-icon="inline-start" className="btn-chrome-ready" />
+            <Ban data-icon="inline-start" className="btn-chrome-blocked" />
             Save
           </Button>
         </div>

@@ -6,11 +6,11 @@ import { lamborghiniAventador } from "./lamborghini-aventador";
 const cars: CarDefinition[] = [ferrariSf25, ferrariEnzo, lamborghiniAventador];
 
 export function listCars() {
-  return cars;
+  return cars.filter((car) => !car.hidden);
 }
 
 export function listConfigurableCars() {
-  return cars.filter((car) => !car.comingSoon);
+  return listCars().filter((car) => !car.comingSoon);
 }
 
 export function getCar(slug: string) {

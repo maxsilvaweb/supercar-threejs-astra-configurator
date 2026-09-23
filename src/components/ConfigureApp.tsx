@@ -9,6 +9,8 @@ import { Tuner } from "./overlay/Tuner";
 import { HotspotLayer } from "./overlay/HotspotLayer";
 import { Preloader } from "./overlay/Preloader";
 import { StudioCanvas } from "./studio/StudioCanvas";
+import { MobileBlock } from "./overlay/MobileBlock";
+import { useDesktopGate } from "../lib/desktop";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string }> {
   state = { error: "" };
@@ -31,6 +33,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string }
 }
 
 export function ConfigureApp({ slug }: { slug: string }) {
+  const desktop = useDesktopGate();
   const car = getCar(slug);
   const [revealed, setRevealed] = useState(false);
 
@@ -45,6 +48,14 @@ export function ConfigureApp({ slug }: { slug: string }) {
     preloadGarageAmbience();
     return () => stopGarageAmbience();
   }, []);
+
+  if (!desktop) {
+    return (
+      <TooltipProvider>
+        <MobileBlock />
+      </TooltipProvider>
+    );
+  }
 
   if (!car || car.comingSoon) {
     return (

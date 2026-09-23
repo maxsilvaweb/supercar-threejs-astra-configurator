@@ -70,6 +70,7 @@ export interface CarDefinition {
   tagline: string;
   model: string;
   comingSoon?: boolean;
+  hidden?: boolean;
   targetLength: number;
   yaw?: number;
   paintGroups: PaintGroup[];

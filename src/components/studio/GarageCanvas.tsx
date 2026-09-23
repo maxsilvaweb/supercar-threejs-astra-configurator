@@ -28,15 +28,13 @@ import { CarModel } from "./CarModel";
 import { GarageRoom } from "./GarageRoom";
 import { SceneOrb } from "./SceneOrb";
 
-preloadModels();
-
 const garageCars = listConfigurableCars();
 const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBuild(car)]));
 
 const bays = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
   { slug: "ferrari-enzo", empty: false, reserved: false, shift: 0 },
-  { slug: "lamborghini-aventador", empty: false, reserved: false, shift: -2.1 },
+  { slug: "lamborghini-aventador", empty: true, reserved: true, shift: -2.1 },
   { slug: "reserve-1", empty: true, reserved: true, shift: 0 },
 ].map((bay, index, list) => {
   const x = LINE.x + (index - (list.length - 1) / 2) * BAY_SPACING + bay.shift;
@@ -432,6 +430,10 @@ export function GarageCanvas({
   selected?: string;
   onSelect: (slug: string) => void;
 }) {
+  useEffect(() => {
+    preloadModels();
+  }, []);
+
   return (
     <div
       className="absolute inset-0"

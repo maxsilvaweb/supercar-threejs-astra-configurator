@@ -12,6 +12,8 @@ const car = slug ? getCar(slug) : undefined;
 ---
 
 <Layout title={`${car?.name || "Configure"} · silvaweb`}>
-  {car?.model ? <link slot="head" rel="preload" href={car.model} as="fetch" crossorigin /> : null}
+  {car?.model ? (
+    <link slot="head" rel="preload" href={car.model} as="fetch" crossorigin media="(min-width: 768px)" />
+  ) : null}
   <ConfigureApp client:only="react" slug={slug || ""} />
 </Layout>

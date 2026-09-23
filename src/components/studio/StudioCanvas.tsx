@@ -16,15 +16,12 @@ import {
 import { rightHandDoorApproach } from "../../lib/camera-paths";
 import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
 import { sitOnGround } from "../../lib/framing";
-import { preloadModels } from "../../lib/models";
 import type { CameraPreset, CarDefinition } from "../../lib/schema";
 import { useConfig } from "../../lib/store";
 import { CarModel } from "./CarModel";
 import { ConfigGarage } from "./ConfigGarage";
 import { DoorHotspots } from "./DoorHotspots";
 import { IgnitionHotspot } from "./IgnitionHotspot";
-
-preloadModels();
 
 const ROOM_BOUNDS = new Box3(
   new Vector3(ROOM.minX, ROOM.floor, ROOM.minZ),

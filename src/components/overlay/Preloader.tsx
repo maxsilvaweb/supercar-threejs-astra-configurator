@@ -4,8 +4,6 @@ import { carPreviewUrl } from "../../lib/constants";
 import { preloadModels } from "../../lib/models";
 import { cn } from "@/lib/utils";
 
-preloadModels();
-
 function describeLoad(item: string, progress: number) {
   const name = item.toLowerCase();
 

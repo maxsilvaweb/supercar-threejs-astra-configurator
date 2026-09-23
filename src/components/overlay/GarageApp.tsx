@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { stopGarageAmbience } from "../../lib/garage-ambience";
 import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
-import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME } from "../../lib/constants";
+import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUDIO_INFO_STORAGE_KEY } from "../../lib/constants";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { cn } from "@/lib/utils";
@@ -18,12 +18,17 @@ import { MenuClickSounds } from "./MenuClickSounds";
 import { Preloader } from "./Preloader";
 import { SoundPanel } from "./SoundPanel";
 import { SavedBuilds } from "./SavedBuilds";
+import { StudioInfoDialog } from "./StudioInfoDialog";
+import { MobileBlock } from "./MobileBlock";
+import { useDesktopGate } from "../../lib/desktop";
 
 export function GarageApp() {
+  const desktop = useDesktopGate();
   const cars = listCars();
   const [hovered, setHovered] = useState<string>();
   const [selected, setSelected] = useState<string>("ferrari-sf25");
   const [ready, setReady] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focused = hovered || selected;
@@ -50,6 +55,14 @@ export function GarageApp() {
     if (slug && cars.find((entry) => entry.slug === slug)?.comingSoon) return;
     setHovered(slug);
   };
+
+  if (!desktop) {
+    return (
+      <TooltipProvider>
+        <MobileBlock />
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TooltipProvider>
@@ -110,6 +123,13 @@ export function GarageApp() {
         ) : null}
 
         <SoundPanel visible={ready} />
+        <StudioInfoDialog
+          open={ready && infoOpen}
+          onProceed={() => {
+            window.localStorage.setItem(STUDIO_INFO_STORAGE_KEY, "1");
+            setInfoOpen(false);
+          }}
+        />
 
         <aside
           className={studioPanelClass(open)}
@@ -236,6 +256,9 @@ export function GarageApp() {
           onDone={() => {
             setReady(true);
             setOpen(isSideOverlay());
+            if (window.localStorage.getItem(STUDIO_INFO_STORAGE_KEY) !== "1") {
+              setInfoOpen(true);
+            }
             void playOneShotSound(STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, true);
           }}
         />

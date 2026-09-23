@@ -358,7 +358,7 @@
   background-blend-mode: screen, normal, overlay, overlay, overlay, overlay;
 }
 
-.btn-chrome:hover,
+.btn-chrome:hover:not(:disabled),
 .btn-chrome.is-active,
 .btn-chrome[data-active="true"],
 .btn-chrome[aria-pressed="true"] {
@@ -375,8 +375,21 @@
   filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.7));
 }
 
+.btn-chrome .btn-chrome-blocked,
 .btn-chequered .btn-chequered-blocked {
   display: none;
+}
+
+.btn-chrome:disabled:hover {
+  filter: brightness(0.72);
+}
+
+.btn-chrome:disabled:hover .btn-chrome-ready {
+  display: none;
+}
+
+.btn-chrome:disabled:hover .btn-chrome-blocked {
+  display: block;
 }
 
 .btn-chequered:hover {
