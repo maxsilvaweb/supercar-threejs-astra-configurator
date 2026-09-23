@@ -4,8 +4,8 @@ dist
 .DS_Store
 
 # Local DCC / convert sources — the app serves public/models
-models/
-textures/
+/models/
+/textures/
 *.blend
 *.fbx
 *.stl
