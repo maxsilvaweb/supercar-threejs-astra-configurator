@@ -1,0 +1,245 @@
+import { ArrowRight, Ban, ChevronsLeft, ChevronsRight, Flag, PanelLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { listCars } from "../../cars";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { stopGarageAmbience } from "../../lib/garage-ambience";
+import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
+import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME } from "../../lib/constants";
+import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
+import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
+import { cn } from "@/lib/utils";
+import { GarageCanvas } from "../studio/GarageCanvas";
+import { HotspotLayer } from "./HotspotLayer";
+import { MenuClickSounds } from "./MenuClickSounds";
+import { Preloader } from "./Preloader";
+import { SoundPanel } from "./SoundPanel";
+import { SavedBuilds } from "./SavedBuilds";
+
+export function GarageApp() {
+  const cars = listCars();
+  const [hovered, setHovered] = useState<string>();
+  const [selected, setSelected] = useState<string>("ferrari-sf25");
+  const [ready, setReady] = useState(false);
+  const [open, setOpen] = useState(false);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focused = hovered || selected;
+
+  useEffect(() => {
+    stopGarageAmbience();
+    preloadSound(STUDIO_GARAGE_ENTRY);
+  }, []);
+
+  useEffect(() => {
+    if (!selected) return;
+    cardRefs.current[selected]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [selected, open]);
+
+  useEffect(() => watchOverlayOpen(ready && open), [open, ready]);
+
+  const choose = (slug: string) => {
+    const car = cars.find((entry) => entry.slug === slug);
+    if (!car || car.comingSoon) return;
+    window.location.href = `/configure/${car.slug}`;
+  };
+
+  const hover = (slug?: string) => {
+    if (slug && cars.find((entry) => entry.slug === slug)?.comingSoon) return;
+    setHovered(slug);
+  };
+
+  return (
+    <TooltipProvider>
+      <MenuClickSounds />
+      <main className="relative h-dvh overflow-hidden">
+        <HotspotLayer>
+        <GarageCanvas
+          focused={focused}
+          hovered={hovered}
+          selected={selected}
+          onSelect={choose}
+        />
+        {ready ? (
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-background/50 via-transparent to-background/15 md:bg-linear-to-r md:from-background/80 md:via-background/10 md:to-transparent" />
+        ) : null}
+
+        {ready && focused ? (
+          <div
+            className={cn(
+              "pointer-events-none absolute z-20 max-w-[min(18rem,calc(100vw-2rem))] rounded-full bg-background/80 px-4 py-2 text-sm backdrop-blur-md",
+              open
+                ? "right-4 bottom-[calc(min(68dvh,36rem)+0.75rem)] md:right-6 md:bottom-6"
+                : "right-4 bottom-4 md:right-6 md:bottom-6",
+            )}
+          >
+            <span className="text-muted-foreground">
+              {hovered ? "Hovering" : "Selected"}{" "}
+            </span>
+            <span className="font-medium">
+              {cars.find((car) => car.slug === focused)?.name}
+            </span>
+          </div>
+        ) : null}
+
+        {ready ? (
+        <div className={studioToggleClass(open)}>
+          <Button
+            size={open ? "icon" : "default"}
+            variant="secondary"
+            aria-label={open ? "Hide garage panel" : "Show garage panel"}
+            aria-expanded={open}
+            className="shadow-lg"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? (
+              <>
+                <ChevronsRight className="rotate-90 md:hidden" />
+                <ChevronsLeft className="hidden md:block" />
+              </>
+            ) : (
+              <>
+                <PanelLeft />
+                Garage
+              </>
+            )}
+          </Button>
+        </div>
+        ) : null}
+
+        <SoundPanel visible={ready} />
+
+        <aside
+          className={studioPanelClass(open)}
+          aria-hidden={!open}
+        >
+          <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-foreground/20 md:hidden" />
+          <p className="mb-3 text-xs font-medium tracking-[0.16em] text-white uppercase">
+            Studio Garage
+          </p>
+          <h1 className="font-heading mb-3 text-2xl font-medium tracking-tight md:text-3xl">Pick a car</h1>
+          <p className="text-muted-foreground mb-8">
+            <span className="md:hidden">Tap a car to look at it, then tap Configure.</span>
+            <span className="hidden md:inline">
+              Hover a car in the list to look at it, then tap it to open the configurator. Race sessions come next.
+            </span>
+          </p>
+
+          <div className="mb-8 grid gap-3">
+            <Button
+              className="btn-chequered w-full disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-100"
+              size="lg"
+              disabled
+            >
+              <Flag data-icon="inline-start" className="btn-chequered-ready" />
+              <Ban data-icon="inline-start" className="btn-chequered-blocked" />
+              Race
+            </Button>
+            <p className="text-muted-foreground text-xs">Coming soon — choose a car and send it out.</p>
+          </div>
+
+          <Separator className="mb-8" />
+
+          <section className="grid gap-4">
+            {cars.map((car) => {
+              const active = focused === car.slug;
+              return (
+                <Card
+                  key={car.slug}
+                  ref={(node) => {
+                    cardRefs.current[car.slug] = node;
+                  }}
+                  role={car.comingSoon ? undefined : "button"}
+                  tabIndex={car.comingSoon ? -1 : 0}
+                  aria-pressed={car.comingSoon ? undefined : active}
+                  aria-disabled={car.comingSoon || undefined}
+                  className={cn(
+                    "gap-0 py-0 [--card-spacing:--spacing(4)] transition-colors",
+                    car.comingSoon
+                      ? "cursor-default opacity-50"
+                      : "cursor-pointer",
+                    !car.comingSoon && active
+                      ? "ring-2 ring-primary"
+                      : !car.comingSoon && "hover:ring-white/25",
+                  )}
+                  onMouseEnter={() => {
+                    if (car.comingSoon) return;
+                    hover(car.slug);
+                    setSelected(car.slug);
+                  }}
+                  onMouseLeave={(event) => {
+                    const next = event.relatedTarget;
+                    if (next instanceof Node && event.currentTarget.contains(next)) return;
+                    if (next instanceof Element && next.closest("aside")) {
+                      hover(undefined);
+                      return;
+                    }
+                  }}
+                  onClick={() => choose(car.slug)}
+                  onKeyDown={(event) => {
+                    if (car.comingSoon) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      choose(car.slug);
+                    }
+                  }}
+                >
+                  <CardHeader className="surface-carbon rounded-t-xl py-(--card-spacing)">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "w-fit capitalize",
+                          car.brand === "ferrari" && "brand-pill-ferrari",
+                          car.brand === "lamborghini" && "brand-pill-lamborghini",
+                        )}
+                      >
+                        {car.brand}
+                      </Badge>
+                      {car.year ? (
+                        <span className="text-xs text-white">{car.year}</span>
+                      ) : null}
+                    </div>
+                    <CardTitle className="text-xl text-white">{car.name}</CardTitle>
+                    <CardDescription className="text-white/80">{car.tagline}</CardDescription>
+                  </CardHeader>
+
+                  <CardFooter className="justify-between">
+                    {car.comingSoon ? (
+                      <span className="text-muted-foreground">Coming soon</span>
+                    ) : (
+                      <Button
+                        asChild
+                        className="btn-chrome"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <a href={`/configure/${car.slug}`}>
+                          Configure
+                          <ArrowRight data-icon="inline-end" />
+                        </a>
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </section>
+
+          <SavedBuilds compact />
+        </aside>
+        </HotspotLayer>
+        <Preloader
+          label="Studio"
+          slug="studio-garage"
+          onDone={() => {
+            setReady(true);
+            setOpen(isSideOverlay());
+            void playOneShotSound(STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, true);
+          }}
+        />
+      </main>
+    </TooltipProvider>
+  );
+}

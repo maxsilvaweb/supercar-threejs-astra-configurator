@@ -1,0 +1,17 @@
+---
+import { ConfigureApp } from "../../components/ConfigureApp";
+import { getCar, listConfigurableCars } from "../../cars";
+import Layout from "../../layouts/Layout.astro";
+
+export function getStaticPaths() {
+  return listConfigurableCars().map((car) => ({ params: { slug: car.slug } }));
+}
+
+const { slug } = Astro.params;
+const car = slug ? getCar(slug) : undefined;
+---
+
+<Layout title={`${car?.name || "Configure"} · silvaweb`}>
+  {car?.model ? <link slot="head" rel="preload" href={car.model} as="fetch" crossorigin /> : null}
+  <ConfigureApp client:only="react" slug={slug || ""} />
+</Layout>

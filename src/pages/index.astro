@@ -1,0 +1,11 @@
+---
+import { GarageApp } from "../components/overlay/GarageApp";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="silvaweb studio">
+  <link slot="head" rel="preload" href="/models/ferrari-sf25.glb" as="fetch" crossorigin />
+  <link slot="head" rel="preload" href="/models/ferrari-enzo.glb" as="fetch" crossorigin />
+  <link slot="head" rel="preload" href="/models/garage.glb" as="fetch" crossorigin />
+  <GarageApp client:only="react" />
+</Layout>
