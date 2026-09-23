@@ -5,7 +5,7 @@ export const paintSwatches = [
   { id: "nero", label: "Nero", hex: "#0D0D0D" },
   { id: "bianco-avus", label: "Bianco Avus", hex: "#F4F4F4" },
   { id: "blu-tour", label: "Blu Tour de France", hex: "#1244B8" },
-  { id: "verde", label: "Verde British", hex: "#1B4D3E" },
+  { id: "verde", label: "Verde British", hex: "#1A7A45" },
   { id: "argento", label: "Argento", hex: "#C0C4C8" },
   { id: "arancio", label: "Arancio", hex: "#FF6A00" },
   { id: "viola", label: "Viola", hex: "#4A1A6B" },

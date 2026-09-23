@@ -1,6 +1,7 @@
 ---
 import { ConfigureApp } from "../../components/ConfigureApp";
 import { getCar, listConfigurableCars } from "../../cars";
+import { CONFIG_GARAGE_MODEL, GARAGE_VENT_URL, RIM_MODEL } from "../../lib/constants";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -15,5 +16,8 @@ const car = slug ? getCar(slug) : undefined;
   {car?.model ? (
     <link slot="head" rel="preload" href={car.model} as="fetch" crossorigin media="(min-width: 768px)" />
   ) : null}
+  <link slot="head" rel="preload" href={CONFIG_GARAGE_MODEL} as="fetch" crossorigin media="(min-width: 768px)" />
+  <link slot="head" rel="preload" href={RIM_MODEL} as="fetch" crossorigin media="(min-width: 768px)" />
+  <link slot="head" rel="preload" href={GARAGE_VENT_URL} as="fetch" crossorigin media="(min-width: 768px)" />
   <ConfigureApp client:only="react" slug={slug || ""} />
 </Layout>

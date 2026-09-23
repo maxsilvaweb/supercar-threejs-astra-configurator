@@ -5,7 +5,6 @@ import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { frameModel } from "../../lib/framing";
 import { findHubs, type Hub } from "../../lib/hubs";
 import { applyCarBuild } from "../../lib/materials";
-import { preloadModels } from "../../lib/models";
 import { useShallow } from "zustand/react/shallow";
 import { snapshotBuild, useConfig } from "../../lib/store";
 import type { CarBuild, CarDefinition } from "../../lib/schema";
@@ -47,8 +46,6 @@ function useApplyCarBuild(root: Group, car: CarDefinition, build: CarBuild) {
     };
   }, [build.aero, build.finish, build.paints, build.rimColor, build.wheel, car, root]);
 }
-
-preloadModels();
 
 function modelUrl(car: CarDefinition) {
   return car.model;

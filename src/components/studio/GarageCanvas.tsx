@@ -22,7 +22,7 @@ import {
   GARAGE_LINE as LINE,
 } from "../../lib/constants";
 import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
-import { preloadModels } from "../../lib/models";
+import { garageModelUrls, preloadModels } from "../../lib/models";
 import { createDefaultBuild } from "../../lib/schema";
 import { CarModel } from "./CarModel";
 import { GarageRoom } from "./GarageRoom";
@@ -431,7 +431,7 @@ export function GarageCanvas({
   onSelect: (slug: string) => void;
 }) {
   useEffect(() => {
-    preloadModels();
+    preloadModels(garageModelUrls());
   }, []);
 
   return (

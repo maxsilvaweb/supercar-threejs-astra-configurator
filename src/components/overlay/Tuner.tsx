@@ -2,7 +2,7 @@ import { ArrowLeft, Ban, ChevronsLeft, ChevronsRight, PanelLeft, RotateCw, Save 
 import { useEffect, useState } from "react";
 import { paintSwatches, rimSwatches } from "../../lib/colors";
 import { preloadSound } from "../../lib/play-one-shot-sound";
-import { IMPACT_DRILL } from "../../lib/constants";
+import { IMPACT_DRILL, SPRAY_PAINT } from "../../lib/constants";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { finishOrder, finishes } from "../../lib/finishes";
@@ -242,6 +242,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
 
   useEffect(() => {
     preloadSound(IMPACT_DRILL);
+    preloadSound(SPRAY_PAINT);
   }, []);
 
   useEffect(() => {

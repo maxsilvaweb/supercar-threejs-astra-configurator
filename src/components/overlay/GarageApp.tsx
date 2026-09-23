@@ -7,6 +7,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { stopGarageAmbience } from "../../lib/garage-ambience";
+import { garageModelUrls } from "../../lib/models";
 import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
 import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUDIO_INFO_STORAGE_KEY } from "../../lib/constants";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
@@ -253,6 +254,7 @@ export function GarageApp() {
         <Preloader
           label="Studio"
           slug="studio-garage"
+          models={garageModelUrls()}
           onDone={() => {
             setReady(true);
             setOpen(isSideOverlay());

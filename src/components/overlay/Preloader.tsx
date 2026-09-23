@@ -29,12 +29,14 @@ export function Preloader({
   name,
   subtitle,
   slug,
+  models,
   onDone,
 }: {
   label?: string;
   name?: string;
   subtitle?: string;
   slug?: string;
+  models?: string[];
   onDone?: () => void;
 }) {
   const { active, progress, item } = useProgress();
@@ -45,10 +47,11 @@ export function Preloader({
   const [shown, setShown] = useState(2);
   const [status, setStatus] = useState("Preparing studio");
   const started = useRef(false);
+  const modelKey = models?.join("|") ?? "";
 
   useEffect(() => {
-    preloadModels();
-  }, []);
+    if (models?.length) preloadModels(models);
+  }, [modelKey, models]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setCovered(true));

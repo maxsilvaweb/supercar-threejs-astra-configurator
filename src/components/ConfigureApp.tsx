@@ -1,6 +1,9 @@
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { getCar } from "../cars";
+import { IMPACT_DRILL, MENU_CLICK, SPRAY_PAINT } from "../lib/constants";
 import { preloadGarageAmbience, startGarageAmbience, stopGarageAmbience } from "../lib/garage-ambience";
+import { configureModelUrls } from "../lib/models";
+import { preloadSounds } from "../lib/play-one-shot-sound";
 import { useConfig } from "../lib/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MenuClickSounds } from "./overlay/MenuClickSounds";
@@ -46,8 +49,9 @@ export function ConfigureApp({ slug }: { slug: string }) {
 
   useEffect(() => {
     preloadGarageAmbience();
+    preloadSounds([IMPACT_DRILL, MENU_CLICK, SPRAY_PAINT, car?.doorSound, car?.ignition?.sound]);
     return () => stopGarageAmbience();
-  }, []);
+  }, [car]);
 
   if (!desktop) {
     return (
@@ -85,6 +89,7 @@ export function ConfigureApp({ slug }: { slug: string }) {
             slug={car.slug}
             name={car.name}
             subtitle={car.tagline}
+            models={configureModelUrls(car.model)}
             onDone={() => {
               setRevealed(true);
               startGarageAmbience();

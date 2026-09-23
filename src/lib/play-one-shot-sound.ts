@@ -35,3 +35,9 @@ export async function playOneShotSound(src: string, volume = 0.85, retryOnGestur
 export function preloadSound(src: string): void {
   getAudio(src).load();
 }
+
+export function preloadSounds(urls: Array<string | undefined>) {
+  for (const url of urls) {
+    if (url) preloadSound(url);
+  }
+}

@@ -6,10 +6,13 @@ export const STUDIO_GARAGE_ENTRY_VOLUME = 0.85;
 export const IMPACT_DRILL = "/sounds/impact-drill.wav";
 export const IMPACT_DRILL_VOLUME = 0.7;
 
+export const SPRAY_PAINT = "/sounds/spray-paint-sound.wav";
+export const SPRAY_PAINT_VOLUME = 0.7;
+
 export const MENU_CLICK = "/sounds/menu-click.wav";
 export const MENU_CLICK_VOLUME = 0.85;
 
-export const GARAGE_VENT_URL = "/sounds/garage-vent-background.flac";
+export const GARAGE_VENT_URL = "/sounds/garage-vent-background.mp3?v=1";
 export const GARAGE_VENT_VOLUME = 0.4;
 
 export const FERRARI_ENZO_DOOR_SOUND = "/sounds/ferrari-enzo/opening-door.wav";

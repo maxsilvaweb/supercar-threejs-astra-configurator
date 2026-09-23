@@ -198,8 +198,14 @@ vec3 sf25Recolor(vec3 linearRgb) {
   bool paintWhite = uPaintWhites > 0.5 && hsl.y < 0.18 && hsl.z > 0.62;
   if (!teamRed && !paintWhite) return linearRgb;
   float luma = dot(srgb, vec3(0.2126, 0.7152, 0.0722));
-  float scale = paintWhite ? max(luma, 0.55) / 0.85 : luma / 0.15;
-  vec3 painted = clamp(uPaint * max(scale, 0.55), vec3(0.0), vec3(1.0));
+  float scale = paintWhite ? max(luma, 0.55) / 0.85 : max(luma, 0.12) / 0.18;
+  vec3 paintSrgb = sf25ToSrgb(uPaint);
+  vec3 paintHsl = sf25Rgb2Hsl(paintSrgb);
+  float paintLuma = dot(paintSrgb, vec3(0.2126, 0.7152, 0.0722));
+  if (!paintWhite && paintHsl.y > 0.18 && paintLuma < 0.34) {
+    paintSrgb *= 0.38 / max(paintLuma, 0.04);
+  }
+  vec3 painted = clamp(paintSrgb * clamp(scale, 0.55, 1.85), vec3(0.0), vec3(1.0));
   return sf25ToLinear(painted);
 }
 `;

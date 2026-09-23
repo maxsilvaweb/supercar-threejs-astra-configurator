@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getCar } from "../cars";
-import { GARAGE_STORAGE_KEY, IMPACT_DRILL, IMPACT_DRILL_VOLUME } from "./constants";
+import { GARAGE_STORAGE_KEY, IMPACT_DRILL, IMPACT_DRILL_VOLUME, SPRAY_PAINT, SPRAY_PAINT_VOLUME } from "./constants";
 import { playOneShotSound } from "./play-one-shot-sound";
 import { createDefaultBuild, type CameraPreset, type CarBuild, type CarDefinition } from "./schema";
 
@@ -123,11 +123,13 @@ export const useConfig = create<ConfigStore>((set, get) => ({
       }
       return { paints };
     });
+    void playOneShotSound(SPRAY_PAINT, SPRAY_PAINT_VOLUME);
   },
   setFinish: (finish) => {
     if (get().finish === finish) return;
     get().beginApply("Applying finish");
     set({ finish });
+    void playOneShotSound(SPRAY_PAINT, SPRAY_PAINT_VOLUME);
   },
   setWheel: (wheel) => {
     if (get().wheel === wheel) return;
