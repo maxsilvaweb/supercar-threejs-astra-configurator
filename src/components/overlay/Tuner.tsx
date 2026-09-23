@@ -8,6 +8,8 @@ import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { finishOrder, finishes } from "../../lib/finishes";
 import type { CameraPreset, CarDefinition } from "../../lib/schema";
 import { useConfig } from "../../lib/store";
+import { BrandMark } from "./BrandMark";
+import { SpecSheet, SpecSummary } from "./CarSpec";
 import { CabinExitButton, canEnterCabin } from "./CabinExitButton";
 import { wheels } from "../../wheels";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +34,7 @@ const sections = [
   { id: "finish", label: "Finish", description: "Gloss, satin, matte, metal" },
   { id: "wheels", label: "Wheels", description: "Factory or aftermarket" },
   { id: "options", label: "Options", description: "Aero packages" },
+  { id: "spec", label: "Spec", description: "Engine and performance" },
   { id: "environment", label: "Studio", description: "Camera presets" },
 ] as const;
 
@@ -200,6 +203,12 @@ function SectionBody({ car, section }: { car: CarDefinition; section: SectionId 
             ))}
           </div>
         )
+      ) : section === "spec" ? (
+        car.spec ? (
+          <SpecSheet facts={car.spec.details} />
+        ) : (
+          <p className="text-muted-foreground">No specification is listed for this model.</p>
+        )
       ) : (
         <ToggleGroup
           type="single"
@@ -305,23 +314,26 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
         <p className="mb-3 text-xs font-medium tracking-[0.16em] text-white uppercase">
           Configure
         </p>
-        <div className="mb-3 flex items-center gap-2">
+        <div className="mb-3 flex items-center gap-2.5">
+          <BrandMark brand={car.brand} />
           <Badge
             variant="secondary"
             className={cn(
               "w-fit capitalize",
               car.brand === "ferrari" && "brand-pill-ferrari",
               car.brand === "porsche" && "brand-pill-porsche",
+              car.brand === "lamborghini" && "brand-pill-lamborghini",
             )}
           >
             {car.brand}
           </Badge>
           {car.year ? <span className="text-xs text-white">{car.year}</span> : null}
         </div>
-        <h1 className="font-heading mb-6 text-2xl font-medium tracking-tight !text-white md:mb-8 md:text-3xl">
+        <h1 className="font-heading mb-4 text-2xl font-medium tracking-tight !text-white md:text-3xl">
           {car.name}
           {car.tagline ? <span className="text-muted-foreground"> {car.tagline}</span> : null}
         </h1>
+        {car.spec ? <SpecSummary facts={car.spec.summary} /> : null}
 
         <div className="mb-8 flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="btn-chrome" asChild>
@@ -365,6 +377,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
           {sections
             .filter((item) => item.id !== "options" || car.aeroParts.length > 0)
             .filter((item) => item.id !== "wheels" || car.hideWhenAftermarket)
+            .filter((item) => item.id !== "spec" || car.spec)
             .map((item) => {
             const active = section === item.id;
             const designLocked = interior && designSections.has(item.id);
@@ -377,7 +390,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
                 aria-disabled={designLocked}
                 className={cn(
                   "cursor-pointer gap-0 py-0 [--card-spacing:--spacing(4)] transition-colors",
-                  active ? "ring-2 ring-primary" : "hover:ring-white/25",
+                  active ? "ring-2 ring-primary" : "ring-2 ring-white/20 hover:ring-primary",
                   designLocked && "pointer-events-none opacity-45",
                 )}
                 onClick={() => {

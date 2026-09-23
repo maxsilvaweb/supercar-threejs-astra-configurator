@@ -7,6 +7,28 @@ export const ferrariEnzo = defineCar({
   name: "Enzo",
   year: "2002",
   tagline: "V12 berlinetta",
+  spec: {
+    highlights: [
+      { label: "Power", value: "660 PS" },
+      { label: "0–100", value: "3.65 s" },
+      { label: "Layout", value: "V12" },
+    ],
+    summary: [
+      { label: "Power", value: "660 PS" },
+      { label: "Torque", value: "657 Nm" },
+      { label: "0–100", value: "3.65 s" },
+      { label: "Top speed", value: ">350 km/h" },
+    ],
+    details: [
+      { label: "Engine", value: "6.0 L V12" },
+      { label: "Power", value: "660 PS" },
+      { label: "Torque", value: "657 Nm" },
+      { label: "0–100", value: "3.65 s" },
+      { label: "Top speed", value: ">350 km/h" },
+      { label: "Weight", value: "1,255 kg dry" },
+      { label: "Drivetrain", value: "Mid-engine, rear-wheel drive" },
+    ],
+  },
   model: FERRARI_ENZO_MODEL,
   targetLength: 4.7,
   yaw: Math.PI / 2,

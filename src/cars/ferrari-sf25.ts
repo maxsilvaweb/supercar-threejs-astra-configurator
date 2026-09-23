@@ -7,6 +7,26 @@ export const ferrariSf25 = defineCar({
   name: "SF-25",
   year: "2025",
   tagline: "Formula 1 challenger",
+  spec: {
+    highlights: [
+      { label: "Power unit", value: "1.6 L V6" },
+      { label: "Layout", value: "Hybrid" },
+      { label: "Drive", value: "Rear-wheel" },
+    ],
+    summary: [
+      { label: "Power unit", value: "1.6 L V6" },
+      { label: "Induction", value: "Turbo hybrid" },
+      { label: "Drive", value: "Rear-wheel" },
+      { label: "Top speed", value: "364 km/h" },
+    ],
+    details: [
+      { label: "Power unit", value: "1.6 L V6 turbo hybrid" },
+      { label: "Layout", value: "Mid-engine" },
+      { label: "Drivetrain", value: "Rear-wheel drive" },
+      { label: "Top speed", value: "364 km/h" },
+      { label: "Championship", value: "2025 Formula 1" },
+    ],
+  },
   model: FERRARI_SF25_MODEL,
   targetLength: 5.4,
   yaw: Math.PI,

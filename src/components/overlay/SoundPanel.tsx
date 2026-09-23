@@ -71,7 +71,7 @@ export function SoundPanel({ visible = true }: { visible?: boolean }) {
         <SoundWave muted={muted} />
         <button
           type="button"
-          className="btn-glossy is-black grid size-9 place-items-center rounded-lg text-white"
+          className="btn-chrome is-steady grid size-9 place-items-center rounded-lg"
           aria-label={muted ? "Unmute sounds" : "Mute sounds"}
           aria-pressed={muted}
           onClick={() => {

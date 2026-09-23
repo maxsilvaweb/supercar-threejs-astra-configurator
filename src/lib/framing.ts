@@ -43,15 +43,13 @@ function lowestPoint(root: Object3D, detect?: string) {
   const pattern = detect ? new RegExp(detect, "i") : null;
 
   root.traverse((object) => {
-    const mesh = object as Mesh;
-    if (!mesh.isMesh) return;
-
     if (pattern && object.name && pattern.test(object.name)) {
       box.setFromObject(object);
       if (!box.isEmpty()) minY = Math.min(minY, box.min.y);
     }
 
-    if (!pattern) return;
+    const mesh = object as Mesh;
+    if (!mesh.isMesh || !pattern) return;
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     if (!materials.some((material) => material?.name && pattern.test(material.name))) return;
     minY = Math.min(minY, lowestMaterialPoint(mesh, pattern));

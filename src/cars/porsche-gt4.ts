@@ -7,6 +7,28 @@ export const porscheGt4 = defineCar({
   name: "Cayman GT4",
   year: "2016",
   tagline: "",
+  spec: {
+    highlights: [
+      { label: "Power", value: "385 PS" },
+      { label: "0–100", value: "4.4 s" },
+      { label: "Layout", value: "Flat-six" },
+    ],
+    summary: [
+      { label: "Power", value: "385 PS" },
+      { label: "Torque", value: "420 Nm" },
+      { label: "0–100", value: "4.4 s" },
+      { label: "Top speed", value: "295 km/h" },
+    ],
+    details: [
+      { label: "Engine", value: "3.8 L flat-six" },
+      { label: "Power", value: "385 PS" },
+      { label: "Torque", value: "420 Nm" },
+      { label: "0–100", value: "4.4 s" },
+      { label: "Top speed", value: "295 km/h" },
+      { label: "Weight", value: "1,340 kg" },
+      { label: "Drivetrain", value: "Mid-engine, rear-wheel drive" },
+    ],
+  },
   model: PORSCHE_GT4_MODEL,
   targetLength: 4.46,
   defaultFinish: "gloss",

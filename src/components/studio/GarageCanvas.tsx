@@ -35,7 +35,7 @@ const bays = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
   { slug: "ferrari-enzo", empty: false, reserved: false, shift: 0 },
   { slug: "porsche-gt4", empty: false, reserved: false, shift: -2.1 },
-  { slug: "reserve-1", empty: true, reserved: true, shift: 0 },
+  { slug: "lamborghini-revuelto", empty: false, reserved: false, shift: -4.2 },
 ].map((bay, index, list) => {
   const x = LINE.x + (index - (list.length - 1) / 2) * BAY_SPACING + bay.shift;
   return {

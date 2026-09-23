@@ -151,12 +151,15 @@ export const useConfig = create<ConfigStore>((set, get) => ({
   setEnvironment: (environment) => set({ environment }),
   setRideHeight: (rideHeight) => set({ rideHeight }),
   setAutoRotate: (autoRotate) => set({ autoRotate }),
-  setCameraPreset: (cameraPreset) =>
+  setCameraPreset: (cameraPreset) => {
+    if (get().cameraPreset === cameraPreset) return;
     set({
       cameraPreset,
       cabinSide: cameraPreset === "interior" ? get().cabinSide ?? "left" : null,
       autoRotate: cameraPreset === "interior" ? false : get().autoRotate,
-    }),
+    });
+    void playOneShotSound(QUICK_WOOSH, QUICK_WOOSH_VOLUME);
+  },
   enterCabin: (side) => {
     set({ cameraPreset: "interior", cabinSide: side, autoRotate: false });
     void playOneShotSound(QUICK_WOOSH, QUICK_WOOSH_VOLUME);

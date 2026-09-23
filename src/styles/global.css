@@ -259,6 +259,31 @@
   }
 }
 
+[data-slot="badge"].garage-pill {
+  background: linear-gradient(180deg, #2a2418 0%, #120f0c 52%, #070605 100%);
+  color: #f5d76e;
+  border-color: rgb(245 215 110 / 0.55);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5),
+    0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+[data-slot="badge"].garage-pill.is-selected {
+  color: #cfff00;
+  border-color: rgb(207 255 0 / 0.7);
+}
+
+[data-slot="badge"].brand-pill-lamborghini {
+  background: linear-gradient(180deg, #2a2418 0%, #120f0c 52%, #070605 100%);
+  color: #f5d76e;
+  border-color: rgb(245 215 110 / 0.45);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5),
+    0 1px 2px rgb(0 0 0 / 0.4);
+}
+
 [data-slot="badge"].brand-pill-porsche {
   background: linear-gradient(180deg, #3a332c 0%, #1a1614 52%, #0c0a09 100%);
   color: #e4c58a;
@@ -367,10 +392,10 @@
   background-blend-mode: screen, normal, overlay, overlay, overlay, overlay;
 }
 
-.btn-chrome:hover:not(:disabled),
-.btn-chrome.is-active,
-.btn-chrome[data-active="true"],
-.btn-chrome[aria-pressed="true"] {
+.btn-chrome:hover:not(:disabled):not(.is-steady),
+.btn-chrome.is-active:not(.is-steady),
+.btn-chrome[data-active="true"]:not(.is-steady),
+.btn-chrome[aria-pressed="true"]:not(.is-steady) {
   background-color: #cfff00;
   background-image: linear-gradient(180deg, #e8ff6a 0%, #cfff00 48%, #b6e000 100%);
   background-blend-mode: normal;

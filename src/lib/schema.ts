@@ -1,4 +1,4 @@
-export type Brand = "ferrari" | "porsche";
+export type Brand = "ferrari" | "porsche" | "lamborghini";
 
 export type FinishId = "gloss" | "satin" | "matte" | "metallic" | "carbon";
 
@@ -62,12 +62,25 @@ export interface AeroPart extends NameMatch {
   defaultVisible: boolean;
 }
 
+export interface CarSpecFact {
+  label: string;
+  value: string;
+}
+
+/** Garage shows `highlights`. The configurator shows `summary`, then `details` inside Spec. */
+export interface CarSpec {
+  highlights: CarSpecFact[];
+  summary: CarSpecFact[];
+  details: CarSpecFact[];
+}
+
 export interface CarDefinition {
   slug: string;
   brand: Brand;
   name: string;
   year: string;
   tagline: string;
+  spec?: CarSpec;
   model: string;
   comingSoon?: boolean;
   hidden?: boolean;

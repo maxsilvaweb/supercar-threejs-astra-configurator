@@ -42,7 +42,7 @@ function isTyreRubber(name: string) {
 }
 
 function isGlass(name: string) {
-  return /cristal|glass|windshield|windscreen/i.test(name) && !/marco|frame/i.test(name);
+  return /cristal|glass|windshield|windscreen/i.test(name) && !/marco|frame|dark|red/i.test(name);
 }
 
 function isInstrumentCluster(name: string) {

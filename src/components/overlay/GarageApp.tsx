@@ -14,6 +14,8 @@ import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { cn } from "@/lib/utils";
 import { GarageCanvas } from "../studio/GarageCanvas";
+import { BrandMark } from "./BrandMark";
+import { SpecHighlights } from "./CarSpec";
 import { HotspotLayer } from "./HotspotLayer";
 import { MenuClickSounds } from "./MenuClickSounds";
 import { Preloader } from "./Preloader";
@@ -185,7 +187,7 @@ export function GarageApp() {
                       : "cursor-pointer",
                     !car.comingSoon && active
                       ? "ring-2 ring-primary"
-                      : !car.comingSoon && "hover:ring-white/25",
+                      : !car.comingSoon && "ring-2 ring-white/20",
                   )}
                   onMouseEnter={() => {
                     if (car.comingSoon) return;
@@ -215,14 +217,11 @@ export function GarageApp() {
                   }}
                 >
                   <CardHeader className="surface-carbon rounded-t-xl py-(--card-spacing)">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <BrandMark brand={car.brand} className="size-8" />
                       <Badge
                         variant="secondary"
-                        className={cn(
-                          "w-fit capitalize",
-                          car.brand === "ferrari" && "brand-pill-ferrari",
-                          car.brand === "porsche" && "brand-pill-porsche",
-                        )}
+                        className={cn("garage-pill w-fit capitalize", active && "is-selected")}
                       >
                         {car.brand}
                       </Badge>
@@ -231,6 +230,11 @@ export function GarageApp() {
                       ) : null}
                     </div>
                     <CardTitle className="text-xl text-white">{car.name}</CardTitle>
+                    {car.spec ? (
+                      <div className="mt-1">
+                        <SpecHighlights facts={car.spec.highlights} />
+                      </div>
+                    ) : null}
                     {car.tagline ? (
                       <CardDescription className="text-white/80">{car.tagline}</CardDescription>
                     ) : null}
@@ -243,6 +247,7 @@ export function GarageApp() {
                       <Button
                         asChild
                         className="btn-chrome"
+                        data-active={active ? "true" : undefined}
                         onClick={(event) => event.stopPropagation()}
                       >
                         <a
