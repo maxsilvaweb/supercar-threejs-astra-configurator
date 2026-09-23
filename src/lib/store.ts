@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getCar } from "../cars";
-import { GARAGE_STORAGE_KEY, IMPACT_DRILL, IMPACT_DRILL_VOLUME, SPRAY_PAINT, SPRAY_PAINT_VOLUME } from "./constants";
+import { GARAGE_STORAGE_KEY, IMPACT_DRILL, IMPACT_DRILL_VOLUME, QUICK_WOOSH, QUICK_WOOSH_VOLUME, SPRAY_PAINT, SPRAY_PAINT_VOLUME } from "./constants";
 import { playOneShotSound } from "./play-one-shot-sound";
 import { createDefaultBuild, type CameraPreset, type CarBuild, type CarDefinition } from "./schema";
 
@@ -157,7 +157,10 @@ export const useConfig = create<ConfigStore>((set, get) => ({
       cabinSide: cameraPreset === "interior" ? get().cabinSide ?? "left" : null,
       autoRotate: cameraPreset === "interior" ? false : get().autoRotate,
     }),
-  enterCabin: (side) => set({ cameraPreset: "interior", cabinSide: side, autoRotate: false }),
+  enterCabin: (side) => {
+    set({ cameraPreset: "interior", cabinSide: side, autoRotate: false });
+    void playOneShotSound(QUICK_WOOSH, QUICK_WOOSH_VOLUME);
+  },
   saveBuild: (thumbnail) => {
     const state = get();
     if (!state.car) return;

@@ -1,5 +1,6 @@
 import { useGLTF } from "@react-three/drei";
 import { listConfigurableCars } from "../cars";
+import type { CarDefinition } from "./schema";
 import { CONFIG_GARAGE_MODEL, FERRARI_ENZO_MODEL, RIM_MODEL, STUDIO_GARAGE_MODEL } from "./constants";
 import { preloadCarDecals } from "./materials";
 
@@ -26,4 +27,13 @@ export function preloadModels(urls: string[]) {
   for (const url of urls) {
     useGLTF.preload(url);
   }
+}
+
+export function prefetchCar(car?: Pick<CarDefinition, "model"> | null) {
+  if (!car?.model) return;
+  preloadModels([car.model]);
+}
+
+export function prefetchConfigure(car?: Pick<CarDefinition, "model"> | null) {
+  preloadModels(configureModelUrls(car?.model));
 }

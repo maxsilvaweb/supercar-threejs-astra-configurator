@@ -12,6 +12,9 @@ export const SPRAY_PAINT_VOLUME = 0.7;
 export const MENU_CLICK = "/sounds/menu-click.wav";
 export const MENU_CLICK_VOLUME = 0.85;
 
+export const QUICK_WOOSH = "/sounds/quick-woosh.mp3";
+export const QUICK_WOOSH_VOLUME = 0.8;
+
 export const GARAGE_VENT_URL = "/sounds/garage-vent-background.mp3?v=1";
 export const GARAGE_VENT_VOLUME = 0.4;
 
@@ -23,7 +26,7 @@ export function carSoundUrl(slug: string, clip = `${slug}.mp3`) {
 }
 
 export function carPreviewUrl(slug: string) {
-  return `/ui/previews/${slug}.jpg`;
+  return `/ui/previews/${slug}.jpg?v=1`;
 }
 
 export const GARAGE_STORAGE_KEY = "car-modeler-garage";
@@ -33,9 +36,9 @@ export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
 export const LAMBORGHINI_AVENTADOR_MODEL = "/models/lamborghini-aventador/lamborghini-aventador.glb?v=fbx1";
-export const RIM_MODEL = "/models/rim/rim.glb";
-export const STUDIO_GARAGE_MODEL = "/models/studio-garage/studio-garage.glb";
-export const CONFIG_GARAGE_MODEL = "/models/config-garage/config-garage.glb";
+export const RIM_MODEL = "/models/rim/rim.glb?v=1";
+export const STUDIO_GARAGE_MODEL = "/models/studio-garage/studio-garage.glb?v=1";
+export const CONFIG_GARAGE_MODEL = "/models/config-garage/config-garage.glb?v=1";
 
 export const ENZO_SIDE_DECAL = "/models/ferrari-enzo/caballo-lateral.png";
 export const ENZO_SIDE_DECAL_ALPHA = "/models/ferrari-enzo/caballo-lateral-alpha.png";

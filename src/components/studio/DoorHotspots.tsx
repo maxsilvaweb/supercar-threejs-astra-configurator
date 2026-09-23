@@ -2,6 +2,7 @@ import { DoorOpen, Pointer } from "lucide-react";
 import { useEffect } from "react";
 import type { Group } from "three";
 import { doorHotspotPoint } from "../../lib/hotspot";
+import { QUICK_WOOSH } from "../../lib/constants";
 import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
 import type { CarDoor, CarDefinition } from "../../lib/schema";
 import { useConfig } from "../../lib/store";
@@ -41,6 +42,7 @@ function DoorMarker({
   const label = door.label ?? `Open ${sideLabel} door and sit inside`;
 
   useEffect(() => {
+    preloadSound(QUICK_WOOSH);
     if (sound) preloadSound(sound);
   }, [sound]);
 

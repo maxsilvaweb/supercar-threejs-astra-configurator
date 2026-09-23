@@ -7,7 +7,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { stopGarageAmbience } from "../../lib/garage-ambience";
-import { garageModelUrls } from "../../lib/models";
+import { garageModelUrls, prefetchCar, prefetchConfigure } from "../../lib/models";
 import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
 import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUDIO_INFO_STORAGE_KEY } from "../../lib/constants";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
@@ -53,8 +53,10 @@ export function GarageApp() {
   };
 
   const hover = (slug?: string) => {
-    if (slug && cars.find((entry) => entry.slug === slug)?.comingSoon) return;
+    const car = slug ? cars.find((entry) => entry.slug === slug) : undefined;
+    if (slug && car?.comingSoon) return;
     setHovered(slug);
+    if (car && !car.comingSoon) prefetchCar(car);
   };
 
   if (!desktop) {
@@ -190,6 +192,11 @@ export function GarageApp() {
                     hover(car.slug);
                     setSelected(car.slug);
                   }}
+                  onFocus={() => {
+                    if (car.comingSoon) return;
+                    hover(car.slug);
+                    setSelected(car.slug);
+                  }}
                   onMouseLeave={(event) => {
                     const next = event.relatedTarget;
                     if (next instanceof Node && event.currentTarget.contains(next)) return;
@@ -236,7 +243,11 @@ export function GarageApp() {
                         className="btn-chrome"
                         onClick={(event) => event.stopPropagation()}
                       >
-                        <a href={`/configure/${car.slug}`}>
+                        <a
+                          href={`/configure/${car.slug}`}
+                          onMouseEnter={() => prefetchConfigure(car)}
+                          onFocus={() => prefetchConfigure(car)}
+                        >
                           Configure
                           <ArrowRight data-icon="inline-end" />
                         </a>

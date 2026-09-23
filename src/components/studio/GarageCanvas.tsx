@@ -22,7 +22,7 @@ import {
   GARAGE_LINE as LINE,
 } from "../../lib/constants";
 import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
-import { garageModelUrls, preloadModels } from "../../lib/models";
+import { garageModelUrls, prefetchCar, prefetchConfigure, preloadModels } from "../../lib/models";
 import { createDefaultBuild } from "../../lib/schema";
 import { CarModel } from "./CarModel";
 import { GarageRoom } from "./GarageRoom";
@@ -337,12 +337,22 @@ function ParkedCars({
               <ConfigureOrb
                 slug={bay.slug}
                 onSelect={onSelect}
-                onEnter={() => hover.keep(bay.slug)}
+                onEnter={() => {
+                  hover.keep(bay.slug);
+                  prefetchConfigure(car);
+                }}
                 onLeave={hover.release}
               />
             ) : null}
             {car && !bay.empty ? (
-              <BayHotspot slug={bay.slug} onEnter={() => hover.keep(bay.slug)} onSelect={onSelect} />
+              <BayHotspot
+                slug={bay.slug}
+                onEnter={() => {
+                  hover.keep(bay.slug);
+                  prefetchCar(car);
+                }}
+                onSelect={onSelect}
+              />
             ) : null}
           </group>
         );

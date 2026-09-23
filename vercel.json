@@ -2,15 +2,15 @@
   "headers": [
     {
       "source": "/models/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, stale-while-revalidate=86400" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
       "source": "/sounds/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, stale-while-revalidate=86400" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
-      "source": "/ui/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, stale-while-revalidate=86400" }]
+      "source": "/ui/previews/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
 }
