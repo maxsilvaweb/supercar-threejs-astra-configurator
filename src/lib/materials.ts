@@ -1,18 +1,22 @@
 import {
+  BufferAttribute,
+  BufferGeometry,
   CanvasTexture,
+  ClampToEdgeWrapping,
   Color,
   DoubleSide,
+  Mesh,
   MeshPhysicalMaterial,
+  PlaneGeometry,
   MeshStandardMaterial,
   RepeatWrapping,
   SRGBColorSpace,
   TextureLoader,
   type Material,
-  type Mesh,
   type Object3D,
   type Texture,
 } from "three";
-import { ENZO_SIDE_DECAL, ENZO_SIDE_DECAL_ALPHA } from "./constants";
+import { ENZO_SIDE_DECAL, ENZO_SIDE_DECAL_ALPHA, LAMBORGHINI_REVUELTO_CLUSTER, PORSCHE_GT4_BADGE, PORSCHE_GT4_CLUSTER } from "./constants";
 import { finishes } from "./finishes";
 import { firstMatch, matchesRule } from "./matching";
 import type { CarBuild, CarDefinition, FinishId } from "./schema";
@@ -35,6 +39,7 @@ function loadTexture(url: string, colorSpace: typeof SRGBColorSpace) {
 export function preloadCarDecals() {
   loadTexture(ENZO_SIDE_DECAL, SRGBColorSpace);
   loadTexture(ENZO_SIDE_DECAL_ALPHA, SRGBColorSpace);
+  loadTexture(LAMBORGHINI_REVUELTO_CLUSTER, SRGBColorSpace);
 }
 
 function isTyreRubber(name: string) {
@@ -49,14 +54,303 @@ function isInstrumentCluster(name: string) {
   return /cuero rojodsf|indicador/i.test(name);
 }
 
-function createClusterMaterial(name: string) {
+function clusterMap() {
+  const map = loadTexture(LAMBORGHINI_REVUELTO_CLUSTER, SRGBColorSpace).clone();
+  map.wrapS = ClampToEdgeWrapping;
+  map.wrapT = ClampToEdgeWrapping;
+  map.needsUpdate = true;
+  return map;
+}
+
+function litClusterMaterial(name: string, map: Texture) {
   return new MeshPhysicalMaterial({
     name,
-    color: "#050505",
-    roughness: 0.92,
-    metalness: 0.02,
-    envMapIntensity: 0.08,
+    color: "#ffffff",
+    map,
+    emissive: "#ffffff",
+    emissiveMap: map,
+    emissiveIntensity: 0.85,
+    roughness: 0.42,
+    metalness: 0,
+    envMapIntensity: 0.12,
   });
+}
+
+let enzoCluster: MeshPhysicalMaterial | null = null;
+
+function createEnzoClusterMaterial(name: string) {
+  if (enzoCluster) {
+    enzoCluster.name = name;
+    return enzoCluster;
+  }
+  enzoCluster = litClusterMaterial(name, clusterMap());
+  return enzoCluster;
+}
+
+/** The Enzo gauge glass is flat, but its UVs run diagonally across the pod. */
+function fitEnzoCluster(mesh: Mesh) {
+  if (mesh.userData.clusterDial) return;
+  const geometry = mesh.geometry.clone();
+  const position = geometry.getAttribute("position");
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  let zMin = Infinity;
+  let zMax = -Infinity;
+  for (let i = 0; i < position.count; i += 1) {
+    const y = position.getY(i);
+    const z = position.getZ(i);
+    if (y < yMin) yMin = y;
+    if (y > yMax) yMax = y;
+    if (z < zMin) zMin = z;
+    if (z > zMax) zMax = z;
+  }
+  const ySpan = yMax - yMin || 1;
+  const zSpan = zMax - zMin || 1;
+  const uv = new Float32Array(position.count * 2);
+  for (let i = 0; i < position.count; i += 1) {
+    uv[i * 2] = (position.getZ(i) - zMin) / zSpan;
+    uv[i * 2 + 1] = (yMax - position.getY(i)) / ySpan;
+  }
+  geometry.setAttribute("uv", new BufferAttribute(uv, 2));
+  mesh.geometry = geometry;
+  mesh.userData.clusterDial = true;
+}
+
+// GaugeCluster_Screen UVs sit in a mirrored slice of an empty atlas.
+// Driver's left is the high U, and the top of the screen is the low V.
+const REVUELTO_CLUSTER_UV = { left: 0.8701, right: 0.1299, top: 0.0781, bottom: 0.5758 };
+let revueltoCluster: MeshPhysicalMaterial | null = null;
+
+function createRevueltoClusterMaterial(name: string) {
+  if (revueltoCluster) {
+    revueltoCluster.name = name;
+    return revueltoCluster;
+  }
+  const map = clusterMap();
+  const { left, right, top, bottom } = REVUELTO_CLUSTER_UV;
+  map.repeat.set((1 - 0) / (left - right), (1 - 0) / (bottom - top));
+  map.offset.set(1 - left * map.repeat.x, 0 - top * map.repeat.y);
+  map.center.set(0, 0);
+  revueltoCluster = litClusterMaterial(name, map);
+  return revueltoCluster;
+}
+
+export function preloadRevueltoCluster() {
+  loadTexture(LAMBORGHINI_REVUELTO_CLUSTER, SRGBColorSpace);
+}
+
+function porscheDialMap() {
+  const map = loadTexture(PORSCHE_GT4_CLUSTER, SRGBColorSpace).clone();
+  map.wrapS = ClampToEdgeWrapping;
+  map.wrapT = ClampToEdgeWrapping;
+  map.needsUpdate = true;
+  return map;
+}
+
+let porscheDial: MeshPhysicalMaterial | null = null;
+
+function createPorscheDialMaterial() {
+  if (porscheDial) return porscheDial;
+  porscheDial = litClusterMaterial("PorscheDial", porscheDialMap());
+  return porscheDial;
+}
+
+export function preloadPorscheCluster() {
+  loadTexture(PORSCHE_GT4_CLUSTER, SRGBColorSpace);
+  loadTexture(PORSCHE_GT4_BADGE, SRGBColorSpace);
+}
+
+let porscheBadge: MeshPhysicalMaterial | null = null;
+
+function createPorscheBadgeMaterial() {
+  if (porscheBadge) return porscheBadge;
+  const map = loadTexture(PORSCHE_GT4_BADGE, SRGBColorSpace).clone();
+  map.flipY = true;
+  map.wrapS = ClampToEdgeWrapping;
+  map.wrapT = ClampToEdgeWrapping;
+  map.needsUpdate = true;
+  porscheBadge = new MeshPhysicalMaterial({
+    name: "PorscheBadge",
+    color: "#ffffff",
+    map,
+    transparent: true,
+    alphaTest: 0.4,
+    roughness: 0.42,
+    metalness: 0.2,
+    emissive: "#ffffff",
+    emissiveMap: map,
+    emissiveIntensity: 0.45,
+    envMapIntensity: 0.35,
+    side: DoubleSide,
+  });
+  return porscheBadge;
+}
+
+function attachPorscheBadge(mesh: Mesh) {
+  if (mesh.userData.porscheBadge) return;
+  mesh.userData.porscheBadge = true;
+  const height = 0.05;
+  const width = height * (442 / 567);
+  const badge = new Mesh(new PlaneGeometry(width, height), createPorscheBadgeMaterial());
+  badge.name = "PorscheBadge";
+  badge.userData.porscheBadgeFace = true;
+  badge.position.set(0, -0.0049, 0.071);
+  badge.castShadow = false;
+  badge.receiveShadow = false;
+  mesh.add(badge);
+}
+
+function isPorscheDialFace(cx: number, cy: number, cz: number, nz: number) {
+  return nz < -0.7 && cy > 0.7 && cz > 0.45 && cx > 0.15 && cx < 0.5;
+}
+
+function porscheDialBand(cx: number) {
+  if (cx < 0.28) return 0;
+  if (cx < 0.37) return 1;
+  return 2;
+}
+
+/** The three gauge glasses share one headlight shell. Each gets its own copy of the dial. */
+function attachPorscheDials(mesh: Mesh) {
+  if (mesh.userData.porscheDials) return;
+  const source = mesh.geometry.clone();
+  const index = source.getIndex();
+  const position = source.getAttribute("position");
+  const normal = source.getAttribute("normal");
+  if (!index || !normal) return;
+
+  const keep: number[] = [];
+  const dialIndices: number[] = [];
+  const vertexBand = new Map<number, number>();
+
+  for (let triangle = 0; triangle < index.count; triangle += 3) {
+    const ia = index.getX(triangle);
+    const ib = index.getX(triangle + 1);
+    const ic = index.getX(triangle + 2);
+    const cx = (position.getX(ia) + position.getX(ib) + position.getX(ic)) / 3;
+    const cy = (position.getY(ia) + position.getY(ib) + position.getY(ic)) / 3;
+    const cz = (position.getZ(ia) + position.getZ(ib) + position.getZ(ic)) / 3;
+    const nz = (normal.getZ(ia) + normal.getZ(ib) + normal.getZ(ic)) / 3;
+    if (!isPorscheDialFace(cx, cy, cz, nz)) {
+      keep.push(ia, ib, ic);
+      continue;
+    }
+    const band = porscheDialBand(cx);
+    dialIndices.push(ia, ib, ic);
+    vertexBand.set(ia, band);
+    vertexBand.set(ib, band);
+    vertexBand.set(ic, band);
+  }
+
+  if (dialIndices.length === 0) return;
+  mesh.userData.porscheDials = true;
+  source.setIndex(keep);
+  mesh.geometry = source;
+
+  const bands = [0, 1, 2].map(() => ({
+    sx: 0,
+    sy: 0,
+    sz: 0,
+    nx: 0,
+    ny: 0,
+    nz: 0,
+    count: 0,
+    verts: [] as number[],
+  }));
+  for (const [vertex, band] of vertexBand) {
+    const group = bands[band];
+    group.verts.push(vertex);
+    group.sx += position.getX(vertex);
+    group.sy += position.getY(vertex);
+    group.sz += position.getZ(vertex);
+    group.nx += normal.getX(vertex);
+    group.ny += normal.getY(vertex);
+    group.nz += normal.getZ(vertex);
+    group.count += 1;
+  }
+
+  const uvFor = new Map<number, [number, number]>();
+  for (const group of bands) {
+    if (!group.count) continue;
+    const cx = group.sx / group.count;
+    const cy = group.sy / group.count;
+    const cz = group.sz / group.count;
+    let nx = group.nx / group.count;
+    let ny = group.ny / group.count;
+    let nz = group.nz / group.count;
+    if (nz > 0) {
+      nx = -nx;
+      ny = -ny;
+      nz = -nz;
+    }
+    const length = Math.hypot(nx, ny, nz) || 1;
+    nx /= length;
+    ny /= length;
+    nz /= length;
+    const upDot = ny;
+    let ux = -nx * upDot;
+    let uy = 1 - ny * upDot;
+    let uz = -nz * upDot;
+    const upLength = Math.hypot(ux, uy, uz) || 1;
+    ux /= upLength;
+    uy /= upLength;
+    uz /= upLength;
+    const rx = ny * uz - nz * uy;
+    const ry = nz * ux - nx * uz;
+    const rz = nx * uy - ny * ux;
+
+    let radius = 0;
+    const projected = group.verts.map((vertex) => {
+      const dx = position.getX(vertex) - cx;
+      const dy = position.getY(vertex) - cy;
+      const dz = position.getZ(vertex) - cz;
+      const across = dx * rx + dy * ry + dz * rz;
+      const rise = dx * ux + dy * uy + dz * uz;
+      radius = Math.max(radius, Math.hypot(across, rise));
+      return { vertex, across, rise };
+    });
+    const span = radius * 2 || 1;
+    for (const item of projected) {
+      uvFor.set(item.vertex, [0.5 - item.across / span, 0.5 - item.rise / span]);
+    }
+  }
+
+  const remap = new Map<number, number>();
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const addVertex = (vertex: number) => {
+    const existing = remap.get(vertex);
+    if (existing !== undefined) return existing;
+    const next = positions.length / 3;
+    remap.set(vertex, next);
+    positions.push(position.getX(vertex), position.getY(vertex), position.getZ(vertex));
+    normals.push(normal.getX(vertex), normal.getY(vertex), normal.getZ(vertex));
+    const coord = uvFor.get(vertex) ?? [0.5, 0.5];
+    uvs.push(coord[0], coord[1]);
+    return next;
+  };
+  for (let cursor = 0; cursor < dialIndices.length; cursor += 3) {
+    indices.push(
+      addVertex(dialIndices[cursor]),
+      addVertex(dialIndices[cursor + 1]),
+      addVertex(dialIndices[cursor + 2]),
+    );
+  }
+
+  const dialGeometry = new BufferGeometry();
+  dialGeometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
+  dialGeometry.setAttribute("normal", new BufferAttribute(new Float32Array(normals), 3));
+  dialGeometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
+  dialGeometry.setIndex(indices);
+
+  const dialMesh = new Mesh(dialGeometry, createPorscheDialMaterial());
+  dialMesh.name = "PorscheDials";
+  dialMesh.userData.porscheDialFace = true;
+  dialMesh.castShadow = true;
+  dialMesh.receiveShadow = true;
+  mesh.add(dialMesh);
 }
 
 function createGlassMaterial(name: string, tinted = false) {
@@ -86,6 +380,21 @@ function createRubberMaterial(name: string) {
     metalness: 0,
     envMapIntensity: 0.16,
   });
+}
+
+let porscheCabin: MeshPhysicalMaterial | null = null;
+
+function createPorscheCabinMaterial() {
+  if (porscheCabin) return porscheCabin;
+  porscheCabin = new MeshPhysicalMaterial({
+    name: "Interior2",
+    color: "#101010",
+    roughness: 0.82,
+    metalness: 0,
+    envMapIntensity: 0.22,
+    side: DoubleSide,
+  });
+  return porscheCabin;
 }
 
 function hideMaterial(name: string) {
@@ -398,17 +707,37 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
     const current = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     const next = current.map((material) => {
       const matName = material?.name || "";
+      if (mesh.userData.porscheDialFace) {
+        return createPorscheDialMaterial();
+      }
+      if (mesh.userData.porscheBadgeFace) {
+        return createPorscheBadgeMaterial();
+      }
       if (car.slug === "ferrari-enzo" && isTyreRubber(matName)) {
         return createRubberMaterial(matName);
       }
       if (car.slug === "ferrari-enzo" && isInstrumentCluster(matName)) {
-        return createClusterMaterial(matName);
+        fitEnzoCluster(mesh);
+        return createEnzoClusterMaterial(matName);
+      }
+      if (car.slug === "lamborghini-revuelto" && mesh.name === "GaugeCluster_Screen") {
+        return createRevueltoClusterMaterial(matName);
       }
       if (car.slug === "ferrari-enzo" && /logo perfil/i.test(matName)) {
         return hideMaterial(matName);
       }
       if (car.slug === "porsche-gt4" && isTyreRubber(matName)) {
         return createRubberMaterial(matName);
+      }
+      if (car.slug === "porsche-gt4" && matName === "Chrome1" && /steer/i.test(mesh.name)) {
+        attachPorscheBadge(mesh);
+      }
+      if (car.slug === "porsche-gt4" && matName === "Headlight" && /_body/i.test(mesh.name)) {
+        attachPorscheDials(mesh);
+        return createPorscheCabinMaterial();
+      }
+      if (car.slug === "porsche-gt4" && (matName === "Interior2" || mesh.userData.porscheDials)) {
+        return createPorscheCabinMaterial();
       }
       if (isGlass(matName)) {
         return createGlassMaterial(matName);

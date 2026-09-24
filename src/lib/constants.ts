@@ -22,7 +22,7 @@ export const FERRARI_ENZO_DOOR_SOUND = "/sounds/opening-door.wav";
 
 const previewVersion: Record<string, number> = {
   "porsche-gt4": 2,
-  "lamborghini-revuelto": 1,
+  "lamborghini-revuelto": 2,
 };
 
 export function carPreviewUrl(slug: string) {
@@ -37,6 +37,9 @@ export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
 export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=1";
 export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=1";
+export const LAMBORGHINI_REVUELTO_CLUSTER = "/ui/dials/lamborghini-revuelto.jpg";
+export const PORSCHE_GT4_CLUSTER = "/ui/dials/porsche-gt4.jpg?v=3";
+export const PORSCHE_GT4_BADGE = "/ui/brands/porsche-crest.png";
 export const RIM_MODEL = "/models/rim/rim.glb?v=1";
 export const STUDIO_GARAGE_MODEL = "/models/studio-garage/studio-garage.glb?v=1";
 export const CONFIG_GARAGE_MODEL = "/models/config-garage/config-garage.glb?v=1";

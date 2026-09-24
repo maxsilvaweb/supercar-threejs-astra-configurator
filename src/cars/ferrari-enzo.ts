@@ -61,8 +61,4 @@ export const ferrariEnzo = defineCar({
     left: { eye: { x: 0.32, y: 0.42, z: 0.5 }, look: { x: 0.32, y: 0.36, z: 0.72 } },
     right: { eye: { x: 0.68, y: 0.42, z: 0.5 }, look: { x: 0.68, y: 0.36, z: 0.68 } },
   },
-  ignition: {
-    position: { x: 0.485, y: 0.274, z: 0.645 },
-    buttonDetect: "botn",
-  },
 });

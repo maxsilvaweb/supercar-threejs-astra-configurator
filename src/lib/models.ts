@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { listConfigurableCars } from "../cars";
 import type { CarDefinition } from "./schema";
 import { CONFIG_GARAGE_MODEL, FERRARI_ENZO_MODEL, RIM_MODEL, STUDIO_GARAGE_MODEL } from "./constants";
-import { preloadCarDecals } from "./materials";
+import { preloadCarDecals, preloadPorscheCluster, preloadRevueltoCluster } from "./materials";
 
 let garageUrls: string[] | undefined;
 
@@ -23,6 +23,12 @@ export function configureModelUrls(carModel?: string) {
 export function preloadModels(urls: string[]) {
   if (urls.includes(FERRARI_ENZO_MODEL) || urls.some((url) => url.includes("ferrari-enzo"))) {
     preloadCarDecals();
+  }
+  if (urls.some((url) => url.includes("lamborghini-revuelto"))) {
+    preloadRevueltoCluster();
+  }
+  if (urls.some((url) => url.includes("porsche-gt4"))) {
+    preloadPorscheCluster();
   }
   for (const url of urls) {
     useGLTF.preload(url);
