@@ -31,7 +31,7 @@ import { SceneOrb } from "./SceneOrb";
 const garageCars = listConfigurableCars();
 const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBuild(car)]));
 
-const bays = [
+const row = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
   { slug: "ferrari-enzo", empty: false, reserved: false, shift: 0 },
   { slug: "porsche-gt4", empty: false, reserved: false, shift: -2.1 },
@@ -45,6 +45,24 @@ const bays = [
   };
 });
 
+const sf25Bay = row[0];
+const bays = [
+  ...row,
+  {
+    slug: "chevrolet-zr1",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [sf25Bay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    rotation: FACE,
+    // Straight ahead of the nose, still behind the SF-25 so that car stays out of frame.
+    focus: {
+      position: [0, 1.35, 6.5] as [number, number, number],
+      look: [0, 0.78, 1.2] as [number, number, number],
+    },
+  },
+];
+
 const lookTargets = Object.fromEntries(
   bays.map((bay) => [bay.slug, [bay.position[0], 0.55, bay.position[2]] as [number, number, number]]),
 );
@@ -52,15 +70,30 @@ const lookTargets = Object.fromEntries(
 const HOME_LOOK = new Vector3(GARAGE_HOME_LOOK.x, GARAGE_HOME_LOOK.y, GARAGE_HOME_LOOK.z);
 const HOME_POS = new Vector3(GARAGE_HOME_POSITION.x, GARAGE_HOME_POSITION.y, GARAGE_HOME_POSITION.z);
 
+function bayFocus(bay: (typeof bays)[number]) {
+  return "focus" in bay ? bay.focus : undefined;
+}
+
 function restLook(slug?: string) {
   const bay = bays.find((entry) => entry.slug === slug && !entry.empty);
-  const target = bay ? lookTargets[bay.slug] : undefined;
+  if (!bay) return HOME_LOOK.clone();
+  const focus = bayFocus(bay);
+  if (focus) {
+    const [x, y, z] = focus.look;
+    return new Vector3(bay.position[0] + x, y, bay.position[2] + z);
+  }
+  const target = lookTargets[bay.slug];
   return target ? new Vector3(...target) : HOME_LOOK.clone();
 }
 
 function restPosition(slug?: string) {
   const bay = bays.find((entry) => entry.slug === slug && !entry.empty);
   if (!bay) return HOME_POS.clone();
+  const focus = bayFocus(bay);
+  if (focus) {
+    const [x, y, z] = focus.position;
+    return new Vector3(bay.position[0] + x, y, bay.position[2] + z);
+  }
   return new Vector3(bay.position[0] + 0.5, 1.65, HOME_POS.z);
 }
 

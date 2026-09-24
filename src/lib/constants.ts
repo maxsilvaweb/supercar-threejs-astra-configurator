@@ -41,6 +41,7 @@ export const ENGINE_SFX_STORAGE_KEY = "car-modeler-engine-sfx";
 export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
+export const CHEVROLET_ZR1_MODEL = "/models/chevrolet-zr1/chevrolet-zr1.glb?v=1";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
 export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=1";
 export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=1";

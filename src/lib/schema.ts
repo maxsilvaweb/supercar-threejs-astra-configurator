@@ -1,4 +1,4 @@
-export type Brand = "ferrari" | "porsche" | "lamborghini";
+export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet";
 
 export type FinishId = "gloss" | "satin" | "matte" | "metallic" | "carbon";
 
