@@ -6,8 +6,17 @@ export const brandMark: Record<Brand, string> = {
   porsche: "/ui/brands/porsche.svg",
   lamborghini: "/ui/brands/lamborghini.svg",
   chevrolet: "/ui/brands/chevrolet.svg",
+  "aston-martin": "/ui/brands/aston-martin.svg?v=2",
+  toyota: "/ui/brands/toyota.svg",
 };
 
 export function BrandMark({ brand, className }: { brand: Brand; className?: string }) {
-  return <img src={brandMark[brand]} alt="" className={cn("size-10 shrink-0", className)} />;
+  const wide = brand === "aston-martin";
+  return (
+    <img
+      src={brandMark[brand]}
+      alt=""
+      className={cn("shrink-0 object-contain", wide ? "h-7 w-auto" : "size-10", className)}
+    />
+  );
 }

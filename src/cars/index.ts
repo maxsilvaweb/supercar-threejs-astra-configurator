@@ -1,11 +1,13 @@
 import type { CarDefinition } from "../lib/schema";
+import { astonMartinValhalla } from "./aston-martin-valhalla";
 import { chevroletZr1 } from "./chevrolet-zr1";
 import { ferrariEnzo } from "./ferrari-enzo";
 import { ferrariSf25 } from "./ferrari-sf25";
 import { lamborghiniRevuelto } from "./lamborghini-revuelto";
 import { porscheGt4 } from "./porsche-gt4";
+import { toyotaSupraMk5 } from "./toyota-supra-mk5";
 
-const cars: CarDefinition[] = [ferrariSf25, ferrariEnzo, porscheGt4, lamborghiniRevuelto, chevroletZr1];
+const cars: CarDefinition[] = [ferrariSf25, ferrariEnzo, porscheGt4, lamborghiniRevuelto, chevroletZr1, astonMartinValhalla, toyotaSupraMk5];
 
 export function listCars() {
   return cars.filter((car) => !car.hidden);

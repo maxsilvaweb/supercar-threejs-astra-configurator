@@ -67,6 +67,13 @@ export function frameModel(root: Object3D, car: CarDefinition) {
   root.position.set(0, 0, 0);
   root.rotation.set(0, car.yaw ?? 0, 0);
   root.scale.setScalar(1);
+  if (car.slug === "toyota-supra-mk5") {
+    const pads: Object3D[] = [];
+    root.traverse((object) => {
+      if (/^Plane\.?028$/.test(object.name)) pads.push(object);
+    });
+    for (const pad of pads) pad.removeFromParent();
+  }
   root.updateMatrixWorld(true);
 
   box.setFromObject(root);

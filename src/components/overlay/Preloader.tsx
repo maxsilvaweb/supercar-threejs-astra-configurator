@@ -85,15 +85,17 @@ export function Preloader({
     return () => cancelAnimationFrame(frame);
   }, [active, progress]);
 
-  const loaded = !active && (progress >= 99 || !started.current);
+  const percent = Math.round(shown);
+  const settled = !active && (progress >= 99 || !started.current);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
   useEffect(() => {
-    if (!copyIn || !loaded || peeling) return;
+    if (!copyIn || peeling) return;
+    if (!settled && percent < 100) return;
     const peel = window.setTimeout(() => setPeeling(true), 700);
     return () => window.clearTimeout(peel);
-  }, [copyIn, loaded, peeling]);
+  }, [copyIn, peeling, settled, percent]);
 
   useEffect(() => {
     if (!peeling) return;
@@ -107,8 +109,6 @@ export function Preloader({
   }, [visible]);
 
   if (!visible) return null;
-
-  const percent = Math.round(shown);
 
   return (
     <div
@@ -125,7 +125,10 @@ export function Preloader({
         <BrandMark
           brand={brand}
           className={cn(
-            "preloader-mark top-[-7rem] left-[-6rem] h-auto w-[min(46rem,78vw)]",
+            "preloader-mark h-auto",
+            brand === "aston-martin"
+              ? "top-8 left-8 w-[min(32rem,62vw)]"
+              : "top-[-7rem] left-[-6rem] w-[min(46rem,78vw)]",
             copyIn && "is-visible",
           )}
         />

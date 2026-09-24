@@ -703,6 +703,9 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
       if (/BODY_44/i.test(mesh.name)) mesh.visible = false;
       if (/BODY_16/i.test(mesh.name)) mesh.visible = true;
     }
+    if (car.slug === "aston-martin-valhalla" && /^Object_(62|65|68|71|74|77)$/.test(mesh.name)) {
+      mesh.visible = false;
+    }
 
     const current = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     const next = current.map((material) => {

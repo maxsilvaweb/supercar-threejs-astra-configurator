@@ -46,6 +46,12 @@ const row = [
 });
 
 const sf25Bay = row[0];
+const enzoBay = row[1];
+const caymanBay = row[2];
+const backRowFocus = {
+  position: [0, 1.35, 6.5] as [number, number, number],
+  look: [0, 0.78, 1.2] as [number, number, number],
+};
 const bays = [
   ...row,
   {
@@ -56,10 +62,25 @@ const bays = [
     position: [sf25Bay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
     rotation: FACE,
     // Straight ahead of the nose, still behind the SF-25 so that car stays out of frame.
-    focus: {
-      position: [0, 1.35, 6.5] as [number, number, number],
-      look: [0, 0.78, 1.2] as [number, number, number],
-    },
+    focus: backRowFocus,
+  },
+  {
+    slug: "aston-martin-valhalla",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [enzoBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
+  },
+  {
+    slug: "toyota-supra-mk5",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [caymanBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
   },
 ];
 

@@ -218,7 +218,10 @@ export function GarageApp() {
                 >
                   <CardHeader className="surface-carbon rounded-t-xl py-(--card-spacing)">
                     <div className="flex items-center gap-2.5">
-                      <BrandMark brand={car.brand} className="size-8" />
+                      <BrandMark
+                        brand={car.brand}
+                        className={car.brand === "aston-martin" ? "h-6 w-auto" : "size-8"}
+                      />
                       <Badge
                         variant="secondary"
                         className={cn("garage-pill w-fit capitalize", active && "is-selected")}
