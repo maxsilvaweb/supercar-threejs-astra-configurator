@@ -31,6 +31,9 @@ export function carPreviewUrl(slug: string) {
 
 export const GARAGE_STORAGE_KEY = "car-modeler-garage";
 export const MUTE_STORAGE_KEY = "car-modeler-muted";
+export const VOLUME_STORAGE_KEY = "car-modeler-volume";
+export const GARAGE_AMBIENCE_STORAGE_KEY = "car-modeler-garage-ambience";
+export const INTERFACE_SFX_STORAGE_KEY = "car-modeler-interface-sfx";
 export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";

@@ -1,7 +1,7 @@
 import type { Brand } from "../../lib/schema";
 import { cn } from "@/lib/utils";
 
-const brandMark: Record<Brand, string> = {
+export const brandMark: Record<Brand, string> = {
   ferrari: "/ui/brands/ferrari.svg",
   porsche: "/ui/brands/porsche.svg",
   lamborghini: "/ui/brands/lamborghini.svg",

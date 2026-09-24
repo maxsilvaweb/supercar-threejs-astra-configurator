@@ -82,11 +82,12 @@ export function ConfigureApp({ slug }: { slug: string }) {
           <HotspotLayer>
             <StudioCanvas car={car} />
             <Tuner car={car} revealed={revealed} />
-            <SoundPanel visible={revealed} />
+            <SoundPanel visible={revealed} ambience />
           </HotspotLayer>
           <Preloader
             label="Configure"
             slug={car.slug}
+            brand={car.brand}
             name={car.name}
             subtitle={car.tagline}
             models={configureModelUrls(car.model)}

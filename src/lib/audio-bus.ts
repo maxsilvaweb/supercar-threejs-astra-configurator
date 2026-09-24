@@ -1,8 +1,10 @@
-import { MUTE_STORAGE_KEY as MUTE_KEY } from "./constants";
+import { MUTE_STORAGE_KEY as MUTE_KEY, VOLUME_STORAGE_KEY as VOLUME_KEY } from "./constants";
 const tapped = new WeakSet<HTMLMediaElement>();
 const muteListeners = new Set<(muted: boolean) => void>();
+const volumeListeners = new Set<(volume: number) => void>();
 
 let muted = typeof localStorage !== "undefined" && localStorage.getItem(MUTE_KEY) === "1";
+let volume = readVolume();
 let ctx: AudioContext | null = null;
 let mix: GainNode | null = null;
 let analyser: AnalyserNode | null = null;
@@ -14,6 +16,23 @@ function readMuted() {
   } catch {
     return false;
   }
+}
+
+function readVolume() {
+  try {
+    const raw = localStorage.getItem(VOLUME_KEY);
+    if (raw == null) return 1;
+    const stored = Number(raw);
+    if (Number.isFinite(stored) && stored >= 0 && stored <= 1) return stored;
+  } catch {
+    // ignore
+  }
+  return 1;
+}
+
+function applyOutput() {
+  if (!output) return;
+  output.gain.value = muted ? 0 : volume;
 }
 
 muted = readMuted();
@@ -30,7 +49,7 @@ function ensureGraph() {
   nextMix.connect(nextAnalyser);
   nextAnalyser.connect(nextOut);
   nextOut.connect(next.destination);
-  nextOut.gain.value = muted ? 0 : 1;
+  nextOut.gain.value = muted ? 0 : volume;
 
   ctx = next;
   mix = nextMix;
@@ -41,6 +60,29 @@ function ensureGraph() {
 
 export function isMuted() {
   return muted;
+}
+
+export function getVolume() {
+  return volume;
+}
+
+export function subscribeVolume(listener: (value: number) => void) {
+  volumeListeners.add(listener);
+  return () => {
+    volumeListeners.delete(listener);
+  };
+}
+
+export function setVolume(value: number) {
+  volume = Math.min(1, Math.max(0, value));
+  try {
+    localStorage.setItem(VOLUME_KEY, String(volume));
+  } catch {
+    // ignore quota
+  }
+  applyOutput();
+  volumeListeners.forEach((listener) => listener(volume));
+  void resumeAudio();
 }
 
 export function subscribeMute(listener: (value: boolean) => void) {
@@ -57,7 +99,7 @@ export function setMuted(value: boolean) {
   } catch {
     // ignore quota
   }
-  if (output) output.gain.value = value ? 0 : 1;
+  applyOutput();
   muteListeners.forEach((listener) => listener(value));
   void resumeAudio();
 }

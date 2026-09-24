@@ -2,7 +2,9 @@ import { useProgress } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { carPreviewUrl } from "../../lib/constants";
 import { preloadModels } from "../../lib/models";
+import type { Brand } from "../../lib/schema";
 import { cn } from "@/lib/utils";
+import { BrandMark } from "./BrandMark";
 
 function describeLoad(item: string, progress: number) {
   const name = item.toLowerCase();
@@ -29,6 +31,7 @@ export function Preloader({
   name,
   subtitle,
   slug,
+  brand,
   models,
   onDone,
 }: {
@@ -36,6 +39,7 @@ export function Preloader({
   name?: string;
   subtitle?: string;
   slug?: string;
+  brand?: Brand;
   models?: string[];
   onDone?: () => void;
 }) {
@@ -117,6 +121,15 @@ export function Preloader({
       aria-live="polite"
       aria-busy={!peeling}
     >
+      {brand ? (
+        <BrandMark
+          brand={brand}
+          className={cn(
+            "preloader-mark top-[-7rem] left-[-6rem] h-auto w-[min(46rem,78vw)]",
+            copyIn && "is-visible",
+          )}
+        />
+      ) : null}
       <div className="grid h-full place-items-center">
         <div
           className={cn(

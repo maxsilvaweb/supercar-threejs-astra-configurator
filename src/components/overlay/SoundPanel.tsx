@@ -1,7 +1,14 @@
 import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { getAnalyser, isMuted, resumeAudio, setMuted, subscribeMute } from "../../lib/audio-bus";
-import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { getAnalyser, getVolume, isMuted, resumeAudio, setMuted, setVolume, subscribeMute, subscribeVolume } from "../../lib/audio-bus";
+import {
+  isGarageAmbienceEnabled,
+  setGarageAmbienceEnabled,
+  subscribeGarageAmbience,
+} from "../../lib/garage-ambience";
+import { isInterfaceSfxEnabled, setInterfaceSfxEnabled, subscribeInterfaceSfx } from "../../lib/play-one-shot-sound";
 
 function useMuted() {
   const [muted, setMuteState] = useState(isMuted);
@@ -54,37 +61,107 @@ function SoundWave({ muted }: { muted: boolean }) {
       ref={canvasRef}
       width={176}
       height={56}
-      className="hidden h-7 w-[5.5rem] min-[400px]:block"
+      className="absolute inset-0 h-full w-full"
       aria-hidden
     />
   );
 }
 
-export function SoundPanel({ visible = true }: { visible?: boolean }) {
+function useGarageAmbience() {
+  const [enabled, setEnabled] = useState(isGarageAmbienceEnabled);
+  useEffect(() => subscribeGarageAmbience(setEnabled), []);
+  return enabled;
+}
+
+function useVolume() {
+  const [level, setLevel] = useState(getVolume);
+  useEffect(() => subscribeVolume(setLevel), []);
+  return level;
+}
+
+function useInterfaceSfx() {
+  const [enabled, setEnabled] = useState(isInterfaceSfxEnabled);
+  useEffect(() => subscribeInterfaceSfx(setEnabled), []);
+  return enabled;
+}
+
+export function SoundPanel({ visible = true, ambience = false }: { visible?: boolean; ambience?: boolean }) {
   const muted = useMuted();
+  const level = useVolume();
+  const ambienceOn = useGarageAmbience();
+  const interfaceOn = useInterfaceSfx();
 
   if (!visible) return null;
 
   return (
     <div className="pointer-events-auto absolute top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))] z-50">
-      <div className="surface-carbon flex items-center gap-2 rounded-xl border border-white/12 px-2.5 py-1.5 shadow-lg">
-        <SoundWave muted={muted} />
-        <button
-          type="button"
-          className="btn-chrome is-steady grid size-9 place-items-center rounded-lg"
-          aria-label={muted ? "Unmute sounds" : "Mute sounds"}
-          aria-pressed={muted}
-          onClick={() => {
-            void resumeAudio();
-            if (muted) {
-              setMuted(false);
-              return;
-            }
-            window.setTimeout(() => setMuted(true), 90);
-          }}
-        >
-          {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
-        </button>
+      <div className="surface-carbon flex w-max flex-col gap-1.5 rounded-xl border border-white/12 px-2.5 py-1.5 shadow-lg">
+        <div className="flex items-center gap-2">
+          <div className="relative h-7 min-w-0 flex-1">
+            <SoundWave muted={muted} />
+          </div>
+          <button
+            type="button"
+            className="btn-chrome is-steady grid size-9 shrink-0 place-items-center rounded-lg"
+            aria-label={muted ? "Unmute sounds" : "Mute sounds"}
+            aria-pressed={muted}
+            onClick={() => {
+              void resumeAudio();
+              if (muted) {
+                setMuted(false);
+                return;
+              }
+              window.setTimeout(() => setMuted(true), 90);
+            }}
+          >
+            {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+          </button>
+        </div>
+        <div className="flex flex-col gap-1.5 border-t border-white/10 pt-1.5">
+          <div className="flex items-center gap-3 py-1">
+            <span className="text-[0.7rem] tracking-wide whitespace-nowrap text-white/80">Volume</span>
+            <Slider
+              className="w-28"
+              min={0}
+              max={100}
+              step={1}
+              value={[Math.round(level * 100)]}
+              aria-label="Volume"
+              onValueChange={(next) => {
+                const amount = next[0];
+                if (amount === undefined) return;
+                void resumeAudio();
+                setVolume(amount / 100);
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[0.7rem] tracking-wide whitespace-nowrap text-white/80">Interface SFX</span>
+            <Switch
+              size="sm"
+              checked={interfaceOn}
+              aria-label="Interface SFX"
+              onCheckedChange={(checked) => {
+                void resumeAudio();
+                setInterfaceSfxEnabled(checked);
+              }}
+            />
+          </div>
+          {ambience ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[0.7rem] tracking-wide whitespace-nowrap text-white/80">Garage Ventilation SFX</span>
+              <Switch
+                size="sm"
+                checked={ambienceOn}
+                aria-label="Garage Ventilation SFX"
+                onCheckedChange={(checked) => {
+                  void resumeAudio();
+                  setGarageAmbienceEnabled(checked);
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

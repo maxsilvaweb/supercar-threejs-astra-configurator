@@ -274,7 +274,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
 
   return (
     <>
-      <CabinExitButton car={car} visible={revealed && interior} />
+      <CabinExitButton car={car} visible={revealed && interior} hint={revealed} />
 
       {revealed ? (
       <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-background/50 via-transparent to-background/15 md:bg-linear-to-r md:from-background/80 md:via-background/10 md:to-transparent" />
