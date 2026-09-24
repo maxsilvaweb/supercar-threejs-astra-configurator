@@ -8,6 +8,7 @@ import {
   setGarageAmbienceEnabled,
   subscribeGarageAmbience,
 } from "../../lib/garage-ambience";
+import { isEngineSfxEnabled, setEngineSfxEnabled, subscribeEngineSfx } from "../../lib/engine-loop";
 import { isInterfaceSfxEnabled, setInterfaceSfxEnabled, subscribeInterfaceSfx } from "../../lib/play-one-shot-sound";
 
 function useMuted() {
@@ -85,11 +86,18 @@ function useInterfaceSfx() {
   return enabled;
 }
 
+function useEngineSfx() {
+  const [enabled, setEnabled] = useState(isEngineSfxEnabled);
+  useEffect(() => subscribeEngineSfx(setEnabled), []);
+  return enabled;
+}
+
 export function SoundPanel({ visible = true, ambience = false }: { visible?: boolean; ambience?: boolean }) {
   const muted = useMuted();
   const level = useVolume();
   const ambienceOn = useGarageAmbience();
   const interfaceOn = useInterfaceSfx();
+  const engineOn = useEngineSfx();
 
   if (!visible) return null;
 
@@ -144,6 +152,18 @@ export function SoundPanel({ visible = true, ambience = false }: { visible?: boo
               onCheckedChange={(checked) => {
                 void resumeAudio();
                 setInterfaceSfxEnabled(checked);
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[0.7rem] tracking-wide whitespace-nowrap text-white/80">Engine SFX</span>
+            <Switch
+              size="sm"
+              checked={engineOn}
+              aria-label="Engine SFX"
+              onCheckedChange={(checked) => {
+                void resumeAudio();
+                setEngineSfxEnabled(checked);
               }}
             />
           </div>

@@ -1,6 +1,6 @@
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { getCar } from "../cars";
-import { IMPACT_DRILL, MENU_CLICK, QUICK_WOOSH, SPRAY_PAINT } from "../lib/constants";
+import { IMPACT_DRILL, LOW_ENGINE_NOISE, MENU_CLICK, QUICK_WOOSH, SPRAY_PAINT } from "../lib/constants";
 import { preloadGarageAmbience, startGarageAmbience, stopGarageAmbience } from "../lib/garage-ambience";
 import { configureModelUrls } from "../lib/models";
 import { preloadSounds } from "../lib/play-one-shot-sound";
@@ -49,7 +49,7 @@ export function ConfigureApp({ slug }: { slug: string }) {
 
   useEffect(() => {
     preloadGarageAmbience();
-    preloadSounds([IMPACT_DRILL, MENU_CLICK, QUICK_WOOSH, SPRAY_PAINT, car?.doorSound, car?.ignition?.sound]);
+    preloadSounds([IMPACT_DRILL, LOW_ENGINE_NOISE, MENU_CLICK, QUICK_WOOSH, SPRAY_PAINT, car?.doorSound, car?.ignition?.sound]);
     return () => stopGarageAmbience();
   }, [car]);
 
