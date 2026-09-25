@@ -784,6 +784,7 @@
   object-fit: cover;
   object-position: right center;
   pointer-events: none;
+  opacity: 0;
   filter: grayscale(1) brightness(0.62) contrast(1.05);
   -webkit-mask-image:
     linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.72) 42%, transparent 100%),
@@ -793,6 +794,15 @@
     linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.72) 42%, transparent 100%),
     linear-gradient(to bottom, #000 18%, transparent 100%);
   mask-composite: intersect;
+}
+
+.preloader-wash.is-ready,
+.preloader-shot.is-ready {
+  opacity: 1;
+}
+
+.preloader-shot {
+  opacity: 0;
 }
 
 .preloader-mark {

@@ -19,18 +19,19 @@ function describeLoad(item: string, progress: number) {
   const name = item.toLowerCase();
 
   if (/\.(png|jpe?g|webp|ktx2?|hdr|exr)(\?|$)/.test(name) || name.includes("texture") || name.includes("hdri") || name.includes("envmap")) {
-    return "Loading textures";
+    return "Loading textures and sounds";
   }
   if (name.includes("garage") || name.includes("studio")) {
-    return "Loading garage";
+    return "Loading garage and sounds";
   }
   if (/\.(glb|gltf|obj|fbx|bin)(\?|$)/.test(name) || name.includes("/models/")) {
-    return "Loading models";
+    return "Loading models and sounds";
   }
+  if (/\.(wav|mp3|ogg)(\?|$)/.test(name) || name.includes("/sounds/")) return "Loading sounds";
   if (name.includes("draco")) return "Decoding models";
   if (progress < 12) return "Preparing studio";
-  if (progress < 55) return "Loading models";
-  if (progress < 88) return "Loading textures";
+  if (progress < 55) return "Loading models and sounds";
+  if (progress < 88) return "Loading textures and sounds";
   if (progress < 100) return "Preparing studio";
   return "Ready";
 }
@@ -66,6 +67,10 @@ export function Preloader({
   const [peeling, setPeeling] = useState(false);
   const [shown, setShown] = useState(2);
   const [backdrop, setBackdrop] = useState(true);
+  const [backdropReady, setBackdropReady] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
+  const backdropRef = useRef<HTMLImageElement>(null);
+  const previewRef = useRef<HTMLImageElement>(null);
   const carBackdrop = Boolean(slug && getCar(slug));
   const [status, setStatus] = useState("Preparing studio");
   const started = useRef(false);
@@ -74,6 +79,16 @@ export function Preloader({
   useEffect(() => {
     if (models?.length) preloadModels(models);
   }, [modelKey, models]);
+
+  useEffect(() => {
+    const images = [backdropRef.current, previewRef.current];
+    if (images.some((node) => node?.complete && node.naturalWidth > 0 && node.classList.contains("preloader-wash"))) {
+      setBackdropReady(true);
+    }
+    if (images.some((node) => node?.complete && node.naturalWidth > 0 && node.classList.contains("preloader-shot"))) {
+      setPreviewReady(true);
+    }
+  }, [slug]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setCovered(true));
@@ -141,10 +156,14 @@ export function Preloader({
     >
       {carBackdrop && backdrop ? (
         <img
+          ref={backdropRef}
           src={carBackdropUrl(slug)}
           alt=""
-          className="preloader-wash"
+          className={cn("preloader-wash", backdropReady && "is-ready")}
           draggable={false}
+          onLoad={(event) => {
+            if (event.currentTarget.naturalWidth > 0) setBackdropReady(true);
+          }}
           onError={() => setBackdrop(false)}
         />
       ) : null}
@@ -172,10 +191,14 @@ export function Preloader({
           <div className="space-y-5">
             {slug ? (
               <img
+                ref={previewRef}
                 src={carPreviewUrl(slug)}
                 alt=""
-                className="aspect-[960/589] w-full rounded-md object-cover"
+                className={cn("preloader-shot aspect-[960/589] w-full rounded-md object-cover", previewReady && "is-ready")}
                 draggable={false}
+                onLoad={(event) => {
+                  if (event.currentTarget.naturalWidth > 0) setPreviewReady(true);
+                }}
               />
             ) : null}
             <div className="space-y-1.5">
