@@ -272,8 +272,7 @@ export function GarageApp() {
         </aside>
         </HotspotLayer>
         <Preloader
-          label="Studio"
-          name="Warehouse"
+          label="Warehouse"
           slug="studio-garage"
           stamp="Information"
           roster={floor}
