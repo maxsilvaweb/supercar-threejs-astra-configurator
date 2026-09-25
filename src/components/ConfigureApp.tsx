@@ -1,9 +1,9 @@
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { getCar } from "../cars";
-import { STUDIO_SOUNDS } from "../lib/constants";
+import { INTERFACE_SOUNDS, STUDIO_SOUNDS } from "../lib/constants";
 import { preloadGarageAmbience, startGarageAmbience, stopGarageAmbience } from "../lib/garage-ambience";
 import { configureModelUrls } from "../lib/models";
-import { preloadSounds } from "../lib/play-one-shot-sound";
+import { preloadSounds, preloadSoundsLater } from "../lib/play-one-shot-sound";
 import { useConfig } from "../lib/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MenuClickSounds } from "./overlay/MenuClickSounds";
@@ -52,8 +52,9 @@ export function ConfigureApp({ slug }: { slug: string }) {
   }, [slug]);
 
   useEffect(() => {
+    preloadSounds(INTERFACE_SOUNDS);
+    preloadSoundsLater([...STUDIO_SOUNDS, car?.doorSound, car?.ignition?.sound]);
     preloadGarageAmbience();
-    preloadSounds([...STUDIO_SOUNDS, car?.doorSound, car?.ignition?.sound]);
     return () => stopGarageAmbience();
   }, [car]);
 

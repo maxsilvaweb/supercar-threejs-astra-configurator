@@ -2,7 +2,6 @@ import { resumeAudio, tapAudio } from "./audio-bus";
 import { INTERFACE_SFX_STORAGE_KEY } from "./constants";
 
 const cache = new Map<string, HTMLAudioElement>();
-const warming = new Set<string>();
 let enabled = readEnabled();
 const listeners = new Set<(value: boolean) => void>();
 
@@ -47,14 +46,26 @@ function getAudio(src: string): HTMLAudioElement {
   return audio;
 }
 
+function whenReady(audio: HTMLAudioElement) {
+  if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    const done = () => {
+      audio.removeEventListener("canplay", done);
+      resolve();
+    };
+    audio.addEventListener("canplay", done);
+  });
+}
+
 export async function playOneShotSound(src: string, volume = 0.85, retryOnGesture = false): Promise<void> {
   if (!enabled) return;
   const audio = getAudio(src);
   tapAudio(audio);
   void resumeAudio();
   audio.volume = volume;
-  audio.currentTime = 0;
+  if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) audio.currentTime = 0;
   try {
+    await whenReady(audio);
     await audio.play();
   } catch {
     if (!retryOnGesture) return;
@@ -68,11 +79,16 @@ export async function playOneShotSound(src: string, volume = 0.85, retryOnGestur
 }
 
 export function preloadSound(src: string): void {
-  const audio = getAudio(src);
-  audio.load();
-  if (warming.has(src)) return;
-  warming.add(src);
-  void fetch(src, { cache: "force-cache" }).catch(() => {});
+  getAudio(src).load();
+}
+
+export function preloadSoundsLater(urls: Array<string | undefined>) {
+  const run = () => preloadSounds(urls);
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(run);
+    return;
+  }
+  window.setTimeout(run, 4000);
 }
 
 export function preloadSounds(urls: Array<string | undefined>) {

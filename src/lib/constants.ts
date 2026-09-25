@@ -23,10 +23,12 @@ export const LOW_ENGINE_VOLUME = 0.55;
 
 export const FERRARI_ENZO_DOOR_SOUND = "/sounds/opening-door.wav";
 
+/** Short clips the interface plays on click. These stay ahead of the car downloads. */
+export const INTERFACE_SOUNDS = [MENU_CLICK, QUICK_WOOSH, STUDIO_GARAGE_ENTRY];
+
+/** Longer beds. Loaded after the interface clips so they do not occupy the connection. */
 export const STUDIO_SOUNDS = [
-  MENU_CLICK,
-  QUICK_WOOSH,
-  STUDIO_GARAGE_ENTRY,
+  ...INTERFACE_SOUNDS,
   SPRAY_PAINT,
   IMPACT_DRILL,
   GARAGE_VENT_URL,
