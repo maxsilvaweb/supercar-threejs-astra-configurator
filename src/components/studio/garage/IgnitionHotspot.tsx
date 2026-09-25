@@ -1,10 +1,10 @@
 import { Html } from "@react-three/drei";
 import { useState } from "react";
 import type { Group } from "three";
-import type { CarDefinition } from "../../lib/schema";
-import { useConfig } from "../../lib/store";
-import { useHotspotPortal } from "../overlay/HotspotLayer";
-import { CarHotspot } from "./CarHotspot";
+import type { CarDefinition } from "../../../lib/schema";
+import { useConfig } from "../../../lib/store";
+import { useHotspotPortal } from "../../overlay/HotspotLayer";
+import { CarHotspot } from "../CarHotspot";
 
 export function IgnitionHotspot({
   car,

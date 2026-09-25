@@ -2,6 +2,7 @@ import { resumeAudio, tapAudio } from "./audio-bus";
 import { INTERFACE_SFX_STORAGE_KEY } from "./constants";
 
 const cache = new Map<string, HTMLAudioElement>();
+const warming = new Set<string>();
 let enabled = readEnabled();
 const listeners = new Set<(value: boolean) => void>();
 
@@ -67,7 +68,11 @@ export async function playOneShotSound(src: string, volume = 0.85, retryOnGestur
 }
 
 export function preloadSound(src: string): void {
-  getAudio(src).load();
+  const audio = getAudio(src);
+  audio.load();
+  if (warming.has(src)) return;
+  warming.add(src);
+  void fetch(src, { cache: "force-cache" }).catch(() => {});
 }
 
 export function preloadSounds(urls: Array<string | undefined>) {

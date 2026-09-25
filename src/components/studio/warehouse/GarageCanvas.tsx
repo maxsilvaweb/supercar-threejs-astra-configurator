@@ -3,7 +3,7 @@ import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Outline, Select, Selection, Vignette } from "@react-three/postprocessing";
 import { Pointer, Wrench } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { getAccent, subscribeAccent } from "../../lib/accent";
+import { getAccent, subscribeAccent } from "../../../lib/accent";
 import {
   Raycaster,
   Vector2,
@@ -11,7 +11,7 @@ import {
   type PerspectiveCamera as PerspectiveCameraType,
   Vector3,
 } from "three";
-import { listConfigurableCars } from "../../cars";
+import { listConfigurableCars } from "../../../cars";
 import {
   GARAGE_BAY_FACE as FACE,
   GARAGE_BAY_SPACING as BAY_SPACING,
@@ -19,13 +19,13 @@ import {
   GARAGE_HOME_LOOK,
   GARAGE_HOME_POSITION,
   GARAGE_LINE as LINE,
-} from "../../lib/constants";
-import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
-import { garageModelUrls, prefetchCar, prefetchConfigure, preloadModels } from "../../lib/models";
-import { createDefaultBuild } from "../../lib/schema";
-import { CarModel } from "./CarModel";
+} from "../../../lib/constants";
+import { applyOverlayView, useOverlayFrame } from "../../../lib/overlay-frame";
+import { garageModelUrls, prefetchCar, prefetchConfigure, preloadModels } from "../../../lib/models";
+import { createDefaultBuild } from "../../../lib/schema";
+import { CarModel } from "../CarModel";
 import { GarageRoom } from "./GarageRoom";
-import { SceneOrb } from "./SceneOrb";
+import { SceneOrb } from "../SceneOrb";
 
 const garageCars = listConfigurableCars();
 const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBuild(car)]));

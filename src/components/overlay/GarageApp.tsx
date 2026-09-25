@@ -8,12 +8,12 @@ import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { stopGarageAmbience } from "../../lib/garage-ambience";
 import { garageModelUrls, prefetchCar, prefetchConfigure } from "../../lib/models";
-import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
-import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUDIO_INFO_STORAGE_KEY } from "../../lib/constants";
+import { playOneShotSound, preloadSounds } from "../../lib/play-one-shot-sound";
+import { STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUDIO_INFO_STORAGE_KEY, STUDIO_SOUNDS } from "../../lib/constants";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { cn } from "@/lib/utils";
-import { GarageCanvas } from "../studio/GarageCanvas";
+import { GarageCanvas } from "../studio/warehouse/GarageCanvas";
 import { BrandMark } from "./BrandMark";
 import { SpecHighlights } from "./CarSpec";
 import { HotspotLayer } from "./HotspotLayer";
@@ -39,7 +39,7 @@ export function GarageApp() {
 
   useEffect(() => {
     stopGarageAmbience();
-    preloadSound(STUDIO_GARAGE_ENTRY);
+    preloadSounds(STUDIO_SOUNDS);
   }, []);
 
   useEffect(() => {

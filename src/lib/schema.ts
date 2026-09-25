@@ -31,6 +31,8 @@ export interface CarCabin {
   right?: CabinSeat;
   /** Material or object name for the steering wheel (e.g. `volante`). */
   wheelDetect?: string;
+  /** Raise the seated camera, in metres, without changing where it looks. */
+  seatLift?: number;
   /** `direct` skips the right-hand door pan (open-cockpit cars). */
   entry?: "door" | "direct";
 }

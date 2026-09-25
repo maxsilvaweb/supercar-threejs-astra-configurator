@@ -8,7 +8,7 @@ import { applyCarBuild } from "../../lib/materials";
 import { useShallow } from "zustand/react/shallow";
 import { snapshotBuild, useConfig } from "../../lib/store";
 import type { CarBuild, CarDefinition } from "../../lib/schema";
-import { AftermarketWheels } from "./AftermarketWheels";
+import { AftermarketWheels } from "./garage/AftermarketWheels";
 import { CarDecals } from "./CarDecals";
 
 function useApplyCarBuild(root: Group, car: CarDefinition, build: CarBuild) {

@@ -2,9 +2,9 @@ import { useGLTF } from "@react-three/drei";
 import { useLayoutEffect, useMemo } from "react";
 import { Box3, Vector3, type Group, type Mesh } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import type { Hub } from "../../lib/hubs";
-import { RIM_MODEL as RIM_URL } from "../../lib/constants";
-import { createRimMaterial } from "../../lib/materials";
+import type { Hub } from "../../../lib/hubs";
+import { RIM_MODEL as RIM_URL } from "../../../lib/constants";
+import { createRimMaterial } from "../../../lib/materials";
 
 function fitRim(root: Group, hub: Hub) {
   const box = new Box3().setFromObject(root);

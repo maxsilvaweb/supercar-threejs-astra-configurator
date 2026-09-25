@@ -58,18 +58,19 @@ export const astonMartinValhalla = defineCar({
     {
       id: 'passenger',
       side: 'left',
-      position: { x: 0.13, y: 0.16, z: 0.55 },
+      position: { x: 0.13, y: 0.58, z: 0.55 },
       detect: 'Right_Door',
     },
     {
       id: 'driver',
       side: 'right',
-      position: { x: 0.87, y: 0.16, z: 0.55 },
+      position: { x: 0.87, y: 0.58, z: 0.55 },
       detect: 'Left_Door',
     },
   ],
   cabin: {
     wheelDetect: "^Object_368$",
+    seatLift: 0.22,
     right: {
       eye: { x: 0.68, y: 0.34, z: 0.46 },
       look: { x: 0.68, y: 0.32, z: 0.72 },

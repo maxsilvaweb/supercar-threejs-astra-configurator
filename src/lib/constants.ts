@@ -23,6 +23,17 @@ export const LOW_ENGINE_VOLUME = 0.55;
 
 export const FERRARI_ENZO_DOOR_SOUND = "/sounds/opening-door.wav";
 
+export const STUDIO_SOUNDS = [
+  MENU_CLICK,
+  QUICK_WOOSH,
+  STUDIO_GARAGE_ENTRY,
+  SPRAY_PAINT,
+  IMPACT_DRILL,
+  GARAGE_VENT_URL,
+  FERRARI_ENZO_DOOR_SOUND,
+  LOW_ENGINE_NOISE,
+];
+
 const previewVersion: Record<string, number> = {
   "porsche-gt4": 2,
   "lamborghini-revuelto": 2,
@@ -45,12 +56,12 @@ export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 export const STUDIO_ACCENT_STORAGE_KEY = "car-modeler-studio-accent";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
-export const CHEVROLET_ZR1_MODEL = "/models/chevrolet-zr1/chevrolet-zr1.glb?v=1";
-export const ASTON_MARTIN_VALHALLA_MODEL = "/models/aston-martin-valhalla/aston-martin-valhalla.glb?v=1";
-export const TOYOTA_SUPRA_MK5_MODEL = "/models/toyota-supra-mk5/toyota-supra-mk5.glb?v=1";
+export const CHEVROLET_ZR1_MODEL = "/models/chevrolet-zr1/chevrolet-zr1.glb?v=2";
+export const ASTON_MARTIN_VALHALLA_MODEL = "/models/aston-martin-valhalla/aston-martin-valhalla.glb?v=2";
+export const TOYOTA_SUPRA_MK5_MODEL = "/models/toyota-supra-mk5/toyota-supra-mk5.glb?v=2";
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
-export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=1";
-export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=1";
+export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=2";
+export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=2";
 export const LAMBORGHINI_REVUELTO_CLUSTER = "/ui/dials/lamborghini-revuelto.jpg";
 export const PORSCHE_GT4_CLUSTER = "/ui/dials/porsche-gt4.jpg?v=3";
 export const PORSCHE_GT4_BADGE = "/ui/brands/porsche-crest.png";

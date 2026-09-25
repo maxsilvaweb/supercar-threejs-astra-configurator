@@ -11,7 +11,7 @@ import { useConfig } from "../../lib/store";
 import { BrandMark } from "./BrandMark";
 import { SpecSheet, SpecSummary } from "./CarSpec";
 import { CabinExitButton, canEnterCabin } from "./CabinExitButton";
-import { wheels } from "../../wheels";
+import { wheels } from "../studio/wheels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,33 +74,42 @@ function SwatchRow({
   onChange: (hex: string) => void;
   swatches: { id: string; label: string; hex: string }[];
 }) {
+  const selected = value.toLowerCase();
+  const named = swatches.some((swatch) => swatch.hex.toLowerCase() === selected);
+
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2.5">
-        {swatches.map((swatch) => (
-          <button
-            key={swatch.id}
-            type="button"
-            className={`size-9 cursor-pointer rounded-full border border-white/20 transition hover:scale-105 ${
-              value.toLowerCase() === swatch.hex.toLowerCase() ? "ring-2 ring-white ring-offset-2 ring-offset-background" : ""
-            }`}
-            style={{ background: swatch.hex }}
-            title={swatch.label}
-            aria-label={swatch.label}
-            onClick={() => onChange(swatch.hex)}
-          />
-        ))}
-        <label className="size-9 cursor-pointer overflow-hidden rounded-full border border-white/20 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)]">
+      <div className="flex flex-wrap items-center gap-2.5" role="radiogroup" aria-label="Paint colour">
+        {swatches.map((swatch) => {
+          const active = selected === swatch.hex.toLowerCase();
+          return (
+            <button
+              key={swatch.id}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              className={cn("paint-swatch", active && "is-active")}
+              style={{ backgroundColor: swatch.hex }}
+              title={swatch.label}
+              aria-label={swatch.label}
+              onClick={() => onChange(swatch.hex)}
+            />
+          );
+        })}
+        <label className={cn("paint-swatch paint-swatch-custom", !named && "is-active")} title="Custom colour">
           <input
             type="color"
-            className="size-9 cursor-pointer opacity-0"
+            className="size-full cursor-pointer opacity-0"
             value={value}
             aria-label="Custom colour"
             onChange={(event) => onChange(event.target.value)}
           />
         </label>
       </div>
-      <p className="text-muted-foreground text-xs">{colourName(value, swatches)}</p>
+      <p className="flex items-center gap-2 text-xs text-white">
+        <span className="paint-swatch-key" style={{ backgroundColor: value }} aria-hidden />
+        {colourName(value, swatches)}
+      </p>
     </div>
   );
 }

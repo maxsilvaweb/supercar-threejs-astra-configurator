@@ -10,7 +10,7 @@ import {
   Vector3,
 } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { STUDIO_GARAGE_MIN_HEIGHT as MIN_HEIGHT, STUDIO_GARAGE_MODEL as GARAGE_URL } from "../../lib/constants";
+import { STUDIO_GARAGE_MIN_HEIGHT as MIN_HEIGHT, STUDIO_GARAGE_MODEL as GARAGE_URL } from "../../../lib/constants";
 const box = new Box3();
 const center = new Vector3();
 

@@ -1,5 +1,5 @@
-import { RIM_MODEL } from "../lib/constants";
-import { defineWheel, type WheelDefinition } from "../lib/schema";
+import { RIM_MODEL } from "../../lib/constants";
+import { defineWheel, type WheelDefinition } from "../../lib/schema";
 
 export const wheels: WheelDefinition[] = [
   defineWheel({ id: "stock", label: "Factory" }),
