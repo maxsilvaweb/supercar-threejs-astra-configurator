@@ -36,6 +36,14 @@ function describeLoad(item: string, progress: number) {
   return "Ready";
 }
 
+function formatElapsed(ms: number) {
+  const seconds = Math.max(0, ms) / 1000;
+  if (seconds < 60) return `${seconds.toFixed(1)}s`;
+  const minutes = Math.floor(seconds / 60);
+  const rest = Math.floor(seconds % 60);
+  return `${minutes}:${rest.toString().padStart(2, "0")}`;
+}
+
 export function Preloader({
   label = "Studio",
   name,
@@ -73,7 +81,9 @@ export function Preloader({
   const previewRef = useRef<HTMLImageElement>(null);
   const carBackdrop = Boolean(slug && getCar(slug));
   const [status, setStatus] = useState("Preparing studio");
+  const [elapsedMs, setElapsedMs] = useState(0);
   const started = useRef(false);
+  const holdElapsed = useRef(false);
   const modelKey = models?.join("|") ?? "";
 
   useEffect(() => {
@@ -120,6 +130,17 @@ export function Preloader({
 
   const percent = Math.round(shown);
   const settled = !active && (progress >= 99 || !started.current);
+  holdElapsed.current = settled && started.current;
+
+  useEffect(() => {
+    const origin = performance.now();
+    const id = window.setInterval(() => {
+      const next = performance.now() - origin;
+      setElapsedMs(next);
+      if (holdElapsed.current) window.clearInterval(id);
+    }, 100);
+    return () => window.clearInterval(id);
+  }, []);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
@@ -220,7 +241,10 @@ export function Preloader({
                   style={{ width: `${percent}%` }}
                 />
               </div>
-              <p className="text-muted-foreground text-xs tabular-nums">{percent}%</p>
+              <div className="flex items-baseline justify-between">
+                <p className="text-muted-foreground text-xs tabular-nums">{percent}%</p>
+                <p className="text-muted-foreground text-xs tabular-nums">{formatElapsed(elapsedMs)}</p>
+              </div>
             </div>
           </div>
           {history ? (
