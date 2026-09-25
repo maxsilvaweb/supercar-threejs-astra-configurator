@@ -41,6 +41,7 @@ const previewVersion: Record<string, number> = {
   "lamborghini-revuelto": 2,
   "aston-martin-valhalla": 2,
   "toyota-supra-mk5": 2,
+  "bugatti-chiron": 2,
   "studio-garage": 1,
 };
 

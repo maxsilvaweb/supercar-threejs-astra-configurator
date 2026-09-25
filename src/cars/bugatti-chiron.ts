@@ -45,7 +45,7 @@ export const bugattiChiron = defineCar({
   rideHeight: false,
   wheelDetect: "Tire",
   defaultPaints: {
-    body: "#0A1F44",
+    body: "#0D0D0D",
     stripes: "#FF6A00",
   },
   paintGroups: [
@@ -58,29 +58,29 @@ export const bugattiChiron = defineCar({
     {
       id: "stripes",
       label: "Stripes",
-      material: "^CSR2_(Coloured|CarPaint)$",
-      excludeObject: "SeatBelt|Spoiler",
+      material: "^CSR2_CarPaint$",
+      excludeObject: "Spoiler",
     },
   ],
   locked: [
     {
       material: "Badge|Base|Calliper|Carbon|Coloured|Grille|Interior|Light|Wheel|Glass|Window|Mirror|brake|headlight|Park",
-      excludeObject: "Coloured_1|DoorLF_Coloured|DoorRF_Coloured|Trunk_Coloured|^Carbon1 |DoorLF_Carbon1|DoorRF_Carbon1|Trunk_Carbon1",
+      excludeObject: "^Carbon1 |DoorLF_Carbon1|DoorRF_Carbon1|Trunk_Carbon1",
     },
   ],
   aeroParts: [],
   doors: [
-    { id: "passenger", side: "left", position: { x: -0.04, y: 0.5, z: 0.52 }, detect: "DoorLF" },
-    { id: "driver", side: "right", position: { x: 1.04, y: 0.5, z: 0.52 }, detect: "DoorRF" },
+    { id: "driver", side: "right", position: { x: 1.04, y: 0.5, z: 0.52 }, detect: "DoorLF" },
+    { id: "passenger", side: "left", position: { x: -0.04, y: 0.5, z: 0.52 }, detect: "DoorRF" },
   ],
   cabin: {
     right: {
-      eye: { x: 0.3, y: 0.66, z: 0.57 },
-      look: { x: 0.3, y: 0.58, z: 0.78 },
-    },
-    left: {
       eye: { x: 0.68, y: 0.66, z: 0.57 },
       look: { x: 0.68, y: 0.58, z: 0.74 },
+    },
+    left: {
+      eye: { x: 0.3, y: 0.66, z: 0.57 },
+      look: { x: 0.3, y: 0.58, z: 0.78 },
     },
   },
 });
