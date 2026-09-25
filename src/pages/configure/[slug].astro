@@ -1,7 +1,7 @@
 ---
 import { ConfigureApp } from "../../components/ConfigureApp";
 import { getCar, listConfigurableCars } from "../../cars";
-import { CONFIG_GARAGE_MODEL, GARAGE_VENT_URL, RIM_MODEL } from "../../lib/constants";
+import { carBackdropUrl, CONFIG_GARAGE_MODEL, GARAGE_VENT_URL, RIM_MODEL } from "../../lib/constants";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -13,6 +13,9 @@ const car = slug ? getCar(slug) : undefined;
 ---
 
 <Layout title={`${car?.name || "Configure"} · silvaweb`}>
+  {car ? (
+    <link slot="head" rel="preload" href={carBackdropUrl(car.slug)} as="image" fetchpriority="high" media="(min-width: 768px)" />
+  ) : null}
   {car?.model ? (
     <link slot="head" rel="preload" href={car.model} as="fetch" crossorigin media="(min-width: 768px)" />
   ) : null}

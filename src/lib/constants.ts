@@ -48,6 +48,14 @@ export function carPreviewUrl(slug: string) {
   return `/ui/previews/${slug}.jpg?v=${previewVersion[slug] ?? 1}`;
 }
 
+const backdropVersion: Record<string, number> = {
+  "lamborghini-revuelto": 2,
+};
+
+export function carBackdropUrl(slug: string) {
+  return `/ui/backdrops/${slug}.jpg?v=${backdropVersion[slug] ?? 1}`;
+}
+
 export const GARAGE_STORAGE_KEY = "car-modeler-garage";
 export const MUTE_STORAGE_KEY = "car-modeler-muted";
 export const VOLUME_STORAGE_KEY = "car-modeler-volume";

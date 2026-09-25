@@ -1,7 +1,7 @@
 import { useGLTF } from "@react-three/drei";
 import { listConfigurableCars } from "../cars";
 import type { CarDefinition } from "./schema";
-import { CONFIG_GARAGE_MODEL, FERRARI_ENZO_MODEL, RIM_MODEL, STUDIO_GARAGE_MODEL } from "./constants";
+import { carBackdropUrl, CONFIG_GARAGE_MODEL, FERRARI_ENZO_MODEL, RIM_MODEL, STUDIO_GARAGE_MODEL } from "./constants";
 import { preloadCarDecals, preloadPorscheCluster, preloadRevueltoCluster } from "./materials";
 
 let garageUrls: string[] | undefined;
@@ -40,6 +40,12 @@ export function prefetchCar(car?: Pick<CarDefinition, "model"> | null) {
   preloadModels([car.model]);
 }
 
-export function prefetchConfigure(car?: Pick<CarDefinition, "model"> | null) {
+function preloadBackdrop(slug: string) {
+  const image = new Image();
+  image.src = carBackdropUrl(slug);
+}
+
+export function prefetchConfigure(car?: Pick<CarDefinition, "model" | "slug"> | null) {
   preloadModels(configureModelUrls(car?.model));
+  if (car?.slug) preloadBackdrop(car.slug);
 }

@@ -1,7 +1,8 @@
 import { useProgress } from "@react-three/drei";
 import { Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { carPreviewUrl } from "../../lib/constants";
+import { getCar } from "../../cars";
+import { carBackdropUrl, carPreviewUrl } from "../../lib/constants";
 import { preloadModels } from "../../lib/models";
 import type { Brand, CarHistory } from "../../lib/schema";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,8 @@ export function Preloader({
   const [copyIn, setCopyIn] = useState(false);
   const [peeling, setPeeling] = useState(false);
   const [shown, setShown] = useState(2);
+  const [backdrop, setBackdrop] = useState(true);
+  const carBackdrop = Boolean(slug && getCar(slug));
   const [status, setStatus] = useState("Preparing studio");
   const started = useRef(false);
   const modelKey = models?.join("|") ?? "";
@@ -136,6 +139,15 @@ export function Preloader({
       aria-live="polite"
       aria-busy={!peeling}
     >
+      {carBackdrop && backdrop ? (
+        <img
+          src={carBackdropUrl(slug)}
+          alt=""
+          className="preloader-wash"
+          draggable={false}
+          onError={() => setBackdrop(false)}
+        />
+      ) : null}
       {brand ? (
         <BrandMark
           brand={brand}
@@ -148,7 +160,7 @@ export function Preloader({
           )}
         />
       ) : null}
-      <div className="grid h-full place-items-center px-6">
+      <div className="relative z-10 grid h-full place-items-center px-6">
         <div
           className={cn(
             "preloader-copy w-[min(58rem,calc(100vw-3rem))] space-y-5",

@@ -774,8 +774,30 @@
   clip-path: inset(0 0 100% 0);
 }
 
+.preloader-wash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  width: min(72vw, 56rem);
+  height: min(88vh, 46rem);
+  object-fit: cover;
+  object-position: right center;
+  pointer-events: none;
+  filter: grayscale(1) brightness(0.62) contrast(1.05);
+  -webkit-mask-image:
+    linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.72) 42%, transparent 100%),
+    linear-gradient(to bottom, #000 18%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to left, #000 0%, rgb(0 0 0 / 0.72) 42%, transparent 100%),
+    linear-gradient(to bottom, #000 18%, transparent 100%);
+  mask-composite: intersect;
+}
+
 .preloader-mark {
   position: absolute;
+  z-index: 10;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.7s ease;
