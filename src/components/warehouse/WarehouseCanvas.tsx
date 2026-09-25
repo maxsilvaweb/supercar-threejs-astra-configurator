@@ -33,7 +33,7 @@ const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBui
 
 const row = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
-  { slug: "ferrari-enzo", empty: false, reserved: false, shift: 0 },
+  { slug: "bugatti-chiron", empty: false, reserved: false, shift: 0 },
   { slug: "porsche-gt4", empty: false, reserved: false, shift: -2.1 },
   { slug: "lamborghini-revuelto", empty: false, reserved: false, shift: -4.2 },
 ].map((bay, index, list) => {
@@ -49,10 +49,13 @@ const sf25Bay = row[0];
 const enzoBay = row[1];
 const caymanBay = row[2];
 const revueltoBay = row[3];
-const backRowFocus = {
-  position: [0, 1.35, 6.5] as [number, number, number],
-  look: [0, 0.78, 1.2] as [number, number, number],
+const ROW_GAP = 6.7;
+const middleRowFocus = {
+  position: [0, 2.4, 4.2] as [number, number, number],
+  look: [0, 0.7, 0.6] as [number, number, number],
 };
+const middleZ = sf25Bay.position[2] - ROW_GAP;
+const backZ = middleZ - ROW_GAP;
 const bays = [
   ...row,
   {
@@ -60,38 +63,45 @@ const bays = [
     empty: false,
     reserved: false,
     shift: 0,
-    position: [sf25Bay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    position: [sf25Bay.position[0], 0, middleZ] as [number, number, number],
     rotation: FACE,
-    // Straight ahead of the nose, still behind the SF-25 so that car stays out of frame.
-    focus: backRowFocus,
+    focus: middleRowFocus,
   },
   {
     slug: "aston-martin-valhalla",
     empty: false,
     reserved: false,
     shift: 0,
-    position: [enzoBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    position: [enzoBay.position[0], 0, middleZ] as [number, number, number],
     rotation: FACE,
-    focus: backRowFocus,
+    focus: middleRowFocus,
   },
   {
     slug: "toyota-supra-mk5",
     empty: false,
     reserved: false,
     shift: 0,
-    position: [caymanBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    position: [caymanBay.position[0], 0, middleZ] as [number, number, number],
     rotation: FACE,
-    focus: backRowFocus,
+    focus: middleRowFocus,
   },
   {
-    slug: "bugatti-chiron",
+    slug: "ferrari-enzo",
     empty: false,
     reserved: false,
     shift: 0,
-    position: [revueltoBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    position: [revueltoBay.position[0], 0, middleZ] as [number, number, number],
     rotation: FACE,
-    focus: backRowFocus,
+    focus: middleRowFocus,
   },
+  ...[sf25Bay, enzoBay, caymanBay, revueltoBay].map((bay, index) => ({
+    slug: `row-3-${index + 1}`,
+    empty: true,
+    reserved: true,
+    shift: 0,
+    position: [bay.position[0], 0, backZ] as [number, number, number],
+    rotation: FACE,
+  })),
 ];
 
 const lookTargets = Object.fromEntries(

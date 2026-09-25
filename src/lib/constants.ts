@@ -90,10 +90,10 @@ export const STUDIO_GARAGE_MIN_HEIGHT = 5.5;
 export const CONFIG_GARAGE_MIN_HEIGHT = 6.2;
 
 export const GARAGE_BAY_SPACING = 5.4;
-export const GARAGE_LINE = { x: 1.9, z: 1.8 };
+export const GARAGE_LINE = { x: 1.9, z: 5.4 };
 export const GARAGE_BAY_FACE = 0;
 export const GARAGE_HOME_LOOK = { x: 0.85, y: 0.62, z: GARAGE_LINE.z };
-export const GARAGE_HOME_POSITION = { x: 2.85, y: 1.58, z: 9.6 };
+export const GARAGE_HOME_POSITION = { x: 2.85, y: 1.58, z: 13.2 };
 export const GARAGE_FOCUS_DURATION = 0.4;
 
 export const CONFIG_BAY = { x: 3.2, z: 1.4 };
