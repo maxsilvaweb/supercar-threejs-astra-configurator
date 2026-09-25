@@ -11,7 +11,6 @@ import { useConfig } from "../../lib/store";
 import { BrandMark } from "./BrandMark";
 import { SpecSheet, SpecSummary } from "./CarSpec";
 import { CabinExitButton, canEnterCabin } from "./CabinExitButton";
-import { CabinStartButton } from "./CabinStartButton";
 import { wheels } from "../../wheels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,7 @@ function ApplyStatus() {
       <p className="text-lg font-medium tracking-tight text-white">{status || "Applying option"}</p>
       <div className="space-y-2">
         <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div className="apply-bar h-full rounded-full bg-[#cfff00]" />
+          <div className="apply-bar bg-primary h-full rounded-full" />
         </div>
         <p className="text-muted-foreground text-xs">Updating the car</p>
       </div>
@@ -276,7 +275,6 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
   return (
     <>
       <CabinExitButton car={car} visible={revealed && interior} hint={revealed} />
-      <CabinStartButton visible={revealed && interior && state.cabinSide === "right" && canEnterCabin(car)} />
 
       {revealed ? (
       <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-background/50 via-transparent to-background/15 md:bg-linear-to-r md:from-background/80 md:via-background/10 md:to-transparent" />
@@ -341,7 +339,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
           <Button variant="secondary" size="sm" className="btn-chrome" asChild>
             <a href="/">
               <ArrowLeft data-icon="inline-start" />
-              Back to Studio Garage
+              Back to Studio Warehouse
             </a>
           </Button>
           <Button

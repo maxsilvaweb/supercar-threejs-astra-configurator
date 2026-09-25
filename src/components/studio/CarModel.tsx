@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import type { Group } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { frameModel } from "../../lib/framing";
+import { frameModel, poseClosedSpoilers } from "../../lib/framing";
 import { findHubs, type Hub } from "../../lib/hubs";
 import { applyCarBuild } from "../../lib/materials";
 import { useShallow } from "zustand/react/shallow";
@@ -62,13 +62,14 @@ function GltfBody({
   build: CarBuild;
   onHubs: (hubs: Hub[]) => void;
 }) {
-  const { scene } = useGLTF(url);
+  const { scene, animations } = useGLTF(url);
   const root = useMemo(() => clone(scene) as Group, [scene]);
 
   useLayoutEffect(() => {
+    poseClosedSpoilers(root, animations);
     frameModel(root, car);
     onHubs(findHubs(root, car.wheelDetect));
-  }, [car, onHubs, root]);
+  }, [animations, car, onHubs, root]);
 
   useApplyCarBuild(root, car, build);
 

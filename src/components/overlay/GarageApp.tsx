@@ -1,6 +1,6 @@
 import { ArrowRight, Ban, ChevronsLeft, ChevronsRight, Flag, PanelLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { listCars } from "../../cars";
+import { listCars, listConfigurableCars } from "../../cars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,7 @@ import { useDesktopGate } from "../../lib/desktop";
 export function GarageApp() {
   const desktop = useDesktopGate();
   const cars = listCars();
+  const floor = listConfigurableCars();
   const [hovered, setHovered] = useState<string>();
   const [selected, setSelected] = useState<string>("ferrari-sf25");
   const [ready, setReady] = useState(false);
@@ -107,7 +108,7 @@ export function GarageApp() {
           <Button
             size={open ? "icon" : "default"}
             variant="secondary"
-            aria-label={open ? "Hide garage panel" : "Show garage panel"}
+            aria-label={open ? "Hide warehouse panel" : "Show warehouse panel"}
             aria-expanded={open}
             className="shadow-lg"
             onClick={() => setOpen((value) => !value)}
@@ -120,7 +121,7 @@ export function GarageApp() {
             ) : (
               <>
                 <PanelLeft />
-                Garage
+                Warehouse
               </>
             )}
           </Button>
@@ -142,7 +143,7 @@ export function GarageApp() {
         >
           <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-foreground/20 md:hidden" />
           <p className="mb-3 text-xs font-medium tracking-[0.16em] text-white uppercase">
-            Studio Garage
+            Studio Warehouse
           </p>
           <h1 className="font-heading mb-3 text-2xl font-medium tracking-tight md:text-3xl">Pick a car</h1>
           <p className="text-muted-foreground mb-8">
@@ -218,10 +219,7 @@ export function GarageApp() {
                 >
                   <CardHeader className="surface-carbon rounded-t-xl py-(--card-spacing)">
                     <div className="flex items-center gap-2.5">
-                      <BrandMark
-                        brand={car.brand}
-                        className={car.brand === "aston-martin" ? "h-6 w-auto" : "size-8"}
-                      />
+                      <BrandMark brand={car.brand} className="size-8" />
                       <Badge
                         variant="secondary"
                         className={cn("garage-pill w-fit capitalize", active && "is-selected")}
@@ -274,7 +272,15 @@ export function GarageApp() {
         </HotspotLayer>
         <Preloader
           label="Studio"
+          name="Warehouse"
           slug="studio-garage"
+          stamp="Information"
+          roster={floor}
+          history={{
+            kicker: "",
+            headline: "Pick a car",
+            body: "Hover a car in the list to look at it, then tap it to open the configurator.",
+          }}
           models={garageModelUrls()}
           onDone={() => {
             setReady(true);

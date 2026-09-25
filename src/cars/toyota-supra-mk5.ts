@@ -5,6 +5,7 @@ export const toyotaSupraMk5 = defineCar({
   slug: "toyota-supra-mk5",
   brand: "toyota",
   name: "Supra MK5",
+  year: "2019",
   tagline: "",
   spec: {
     highlights: [
@@ -25,6 +26,16 @@ export const toyotaSupraMk5 = defineCar({
       { label: "0–60", value: "3.9 s" },
       { label: "Top speed", value: "155 mph" },
       { label: "Drivetrain", value: "Front-engine, rear-wheel drive" },
+    ],
+  },
+  history: {
+    kicker: "2019 · A90",
+    headline: "Back after 17 years",
+    body: "Toyota premiered the fifth-generation Supra in Detroit in 2019, ending a 17-year gap. It is the first global GR model and was developed with BMW, keeping the front-engine, rear-drive inline-six layout used since 1978.",
+    facts: [
+      { label: "Built", value: "Magna Steyr, Graz" },
+      { label: "Series", value: "TOYOTA GAZOO Racing" },
+      { label: "Layout", value: "Front-engine RWD" },
     ],
   },
   model: TOYOTA_SUPRA_MK5_MODEL,

@@ -27,6 +27,16 @@ export const ferrariSf25 = defineCar({
       { label: "Championship", value: "2025 Formula 1" },
     ],
   },
+  history: {
+    kicker: "2025 · Scuderia Ferrari",
+    headline: "The 71st Ferrari F1 car",
+    body: "The SF-25 is Scuderia Ferrari’s 2025 Formula 1 challenger, unveiled at F1 75 Live. Ferrari presented it as an evolution of the SF-24 for the last season of the current ground-effect rules.",
+    facts: [
+      { label: "Series", value: "2025 Formula 1" },
+      { label: "Line-up", value: "Leclerc · Hamilton" },
+      { label: "Predecessor", value: "SF-24" },
+    ],
+  },
   model: FERRARI_SF25_MODEL,
   targetLength: 5.4,
   yaw: Math.PI,

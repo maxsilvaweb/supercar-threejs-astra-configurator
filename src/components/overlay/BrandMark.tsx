@@ -1,6 +1,15 @@
 import type { Brand } from "../../lib/schema";
 import { cn } from "@/lib/utils";
 
+export const brandLabel: Record<Brand, string> = {
+  ferrari: "Ferrari",
+  porsche: "Porsche",
+  lamborghini: "Lamborghini",
+  chevrolet: "Chevrolet",
+  "aston-martin": "Aston Martin",
+  toyota: "Toyota",
+};
+
 export const brandMark: Record<Brand, string> = {
   ferrari: "/ui/brands/ferrari.svg",
   porsche: "/ui/brands/porsche.svg",

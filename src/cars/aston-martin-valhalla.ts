@@ -28,6 +28,16 @@ export const astonMartinValhalla = defineCar({
       { label: 'Drivetrain', value: 'Mid-engine, all-wheel drive' },
     ],
   },
+  history: {
+    kicker: "2025",
+    headline: "First series mid-engine Aston",
+    body: "Valhalla began as the AM-RB 003 and takes its name from Norse myth, following Valkyrie. Aston Martin calls it the marque’s first series-production mid-engined supercar and first plug-in hybrid.",
+    facts: [
+      { label: "Run", value: "999 cars" },
+      { label: "Deliveries", value: "H2 2025" },
+      { label: "Origin", value: "AM-RB 003" },
+    ],
+  },
   model: ASTON_MARTIN_VALHALLA_MODEL,
   targetLength: 4.73,
   defaultFinish: 'gloss',
@@ -59,13 +69,14 @@ export const astonMartinValhalla = defineCar({
     },
   ],
   cabin: {
+    wheelDetect: "^Object_368$",
     right: {
-      eye: { x: 0.64, y: 0.32, z: 0.46 },
-      look: { x: 0.65, y: 0.29, z: 0.58 },
+      eye: { x: 0.68, y: 0.34, z: 0.46 },
+      look: { x: 0.68, y: 0.32, z: 0.72 },
     },
     left: {
-      eye: { x: 0.4, y: 0.33, z: 0.5 },
-      look: { x: 0.52, y: 0.32, z: 0.74 },
+      eye: { x: 0.38, y: 0.33, z: 0.5 },
+      look: { x: 0.5, y: 0.32, z: 0.74 },
     },
   },
 });

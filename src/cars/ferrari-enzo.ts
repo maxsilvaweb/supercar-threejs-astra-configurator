@@ -29,6 +29,16 @@ export const ferrariEnzo = defineCar({
       { label: "Drivetrain", value: "Mid-engine, rear-wheel drive" },
     ],
   },
+  history: {
+    kicker: "2002 · Maranello",
+    headline: "Named for the founder",
+    body: "Ferrari launched the Enzo in 2002 as a tribute to Enzo Ferrari, in the year Scuderia Ferrari dominated Formula 1. It followed the 288 GTO, F40 and F50 as a limited road car carrying F1-derived technology.",
+    facts: [
+      { label: "Run", value: "399 road cars" },
+      { label: "Line", value: "After the F50" },
+      { label: "Design", value: "Pininfarina" },
+    ],
+  },
   model: FERRARI_ENZO_MODEL,
   targetLength: 4.7,
   yaw: Math.PI / 2,

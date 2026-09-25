@@ -27,6 +27,8 @@ const previewVersion: Record<string, number> = {
   "porsche-gt4": 2,
   "lamborghini-revuelto": 2,
   "aston-martin-valhalla": 2,
+  "toyota-supra-mk5": 2,
+  "studio-garage": 1,
 };
 
 export function carPreviewUrl(slug: string) {
@@ -40,6 +42,7 @@ export const GARAGE_AMBIENCE_STORAGE_KEY = "car-modeler-garage-ambience";
 export const INTERFACE_SFX_STORAGE_KEY = "car-modeler-interface-sfx";
 export const ENGINE_SFX_STORAGE_KEY = "car-modeler-engine-sfx";
 export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
+export const STUDIO_ACCENT_STORAGE_KEY = "car-modeler-studio-accent";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const CHEVROLET_ZR1_MODEL = "/models/chevrolet-zr1/chevrolet-zr1.glb?v=1";

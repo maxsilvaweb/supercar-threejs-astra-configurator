@@ -3,13 +3,12 @@ import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Outline, Select, Selection, Vignette } from "@react-three/postprocessing";
 import { Pointer, Wrench } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { getAccent, subscribeAccent } from "../../lib/accent";
 import {
-  MeshStandardMaterial,
   Raycaster,
   Vector2,
   type Object3D,
   type PerspectiveCamera as PerspectiveCameraType,
-  PointLight,
   Vector3,
 } from "three";
 import { listConfigurableCars } from "../../cars";
@@ -183,36 +182,6 @@ function baySlug(object: Object3D | null) {
   }
 }
 
-function BayMark({ x, z, active }: { x: number; z: number; active: boolean }) {
-  const ring = useRef<MeshStandardMaterial>(null);
-  useFrame((state) => {
-    if (!ring.current || !active) return;
-    ring.current.emissiveIntensity = 0.45 + Math.sin(state.clock.elapsedTime * 5) * 0.35;
-  });
-
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.012, z]} raycast={skipRaycast}>
-      <ringGeometry args={[2.15, 2.28, 48]} />
-      <meshStandardMaterial
-        ref={ring}
-        color={active ? "#cfff00" : "#3a3a3a"}
-        emissive={active ? "#cfff00" : "#000000"}
-        emissiveIntensity={active ? 0.55 : 0}
-      />
-    </mesh>
-  );
-}
-
-function HoverAura({ active }: { active: boolean }) {
-  const light = useRef<PointLight>(null);
-  useFrame((state) => {
-    if (!light.current) return;
-    const pulse = 0.62 + Math.sin(state.clock.elapsedTime * 5.2) * 0.38;
-    light.current.intensity = active ? 2.8 * pulse : 0;
-  });
-  return <pointLight ref={light} color="#cfff00" position={[0, 1.55, 1.15]} distance={5.5} />;
-}
-
 function isConfigureOrb(target: EventTarget | null) {
   return target instanceof Element && Boolean(target.closest(".scene-orb"));
 }
@@ -380,8 +349,6 @@ function ParkedCars({
         const active = hovered === bay.slug || pointed === bay.slug;
         return (
           <group key={bay.slug} position={bay.position} rotation={[0, bay.rotation, 0]} userData={{ bay: bay.slug }}>
-            <BayMark x={0} z={0} active={active} />
-            <HoverAura active={active} />
             {car && build && !bay.empty ? (
               <Select enabled={active}>
                 <CarModel car={car} build={build} />
@@ -427,7 +394,9 @@ function Scene({
   onSelect: (slug: string) => void;
 }) {
   const [pointed, setPointed] = useState<string>();
+  const [accent, setAccentColour] = useState(getAccent);
   const hover = useStickyPoint(setPointed);
+  useEffect(() => subscribeAccent(setAccentColour), []);
   const highlighted = hovered || pointed;
   const cinematic = Boolean(selected);
 
@@ -472,8 +441,8 @@ function Scene({
         <Outline
           edgeStrength={highlighted ? 5.4 : 0}
           pulseSpeed={highlighted ? 0.7 : 0}
-          visibleEdgeColor="#cfff00"
-          hiddenEdgeColor="#7a8f00"
+          visibleEdgeColor={accent.outline}
+          hiddenEdgeColor={accent.outlineDim}
           blur
           xRay
         />

@@ -15,11 +15,17 @@ import {
   type Material,
   type Object3D,
   type Texture,
-} from "three";
-import { ENZO_SIDE_DECAL, ENZO_SIDE_DECAL_ALPHA, LAMBORGHINI_REVUELTO_CLUSTER, PORSCHE_GT4_BADGE, PORSCHE_GT4_CLUSTER } from "./constants";
-import { finishes } from "./finishes";
-import { firstMatch, matchesRule } from "./matching";
-import type { CarBuild, CarDefinition, FinishId } from "./schema";
+} from 'three';
+import {
+  ENZO_SIDE_DECAL,
+  ENZO_SIDE_DECAL_ALPHA,
+  LAMBORGHINI_REVUELTO_CLUSTER,
+  PORSCHE_GT4_BADGE,
+  PORSCHE_GT4_CLUSTER,
+} from './constants';
+import { finishes } from './finishes';
+import { firstMatch, matchesRule } from './matching';
+import type { CarBuild, CarDefinition, FinishId } from './schema';
 
 const textureLoader = new TextureLoader();
 const textureCache = new Map<string, Texture>();
@@ -43,11 +49,17 @@ export function preloadCarDecals() {
 }
 
 function isTyreRubber(name: string) {
-  return /rueddad|neumatico|\btire\b|\btyre\b/i.test(name) && !/logo|llanta/i.test(name);
+  return (
+    /rueddad|neumatico|\btire\b|\btyre\b/i.test(name) &&
+    !/logo|llanta/i.test(name)
+  );
 }
 
 function isGlass(name: string) {
-  return /cristal|glass|windshield|windscreen/i.test(name) && !/marco|frame|dark|red/i.test(name);
+  return (
+    /cristal|glass|windshield|windscreen/i.test(name) &&
+    !/marco|frame|dark|red/i.test(name)
+  );
 }
 
 function isInstrumentCluster(name: string) {
@@ -65,9 +77,9 @@ function clusterMap() {
 function litClusterMaterial(name: string, map: Texture) {
   return new MeshPhysicalMaterial({
     name,
-    color: "#ffffff",
+    color: '#ffffff',
     map,
-    emissive: "#ffffff",
+    emissive: '#ffffff',
     emissiveMap: map,
     emissiveIntensity: 0.85,
     roughness: 0.42,
@@ -91,7 +103,7 @@ function createEnzoClusterMaterial(name: string) {
 function fitEnzoCluster(mesh: Mesh) {
   if (mesh.userData.clusterDial) return;
   const geometry = mesh.geometry.clone();
-  const position = geometry.getAttribute("position");
+  const position = geometry.getAttribute('position');
   let yMin = Infinity;
   let yMax = -Infinity;
   let zMin = Infinity;
@@ -111,14 +123,19 @@ function fitEnzoCluster(mesh: Mesh) {
     uv[i * 2] = (position.getZ(i) - zMin) / zSpan;
     uv[i * 2 + 1] = (yMax - position.getY(i)) / ySpan;
   }
-  geometry.setAttribute("uv", new BufferAttribute(uv, 2));
+  geometry.setAttribute('uv', new BufferAttribute(uv, 2));
   mesh.geometry = geometry;
   mesh.userData.clusterDial = true;
 }
 
 // GaugeCluster_Screen UVs sit in a mirrored slice of an empty atlas.
 // Driver's left is the high U, and the top of the screen is the low V.
-const REVUELTO_CLUSTER_UV = { left: 0.8701, right: 0.1299, top: 0.0781, bottom: 0.5758 };
+const REVUELTO_CLUSTER_UV = {
+  left: 0.8701,
+  right: 0.1299,
+  top: 0.0781,
+  bottom: 0.5758,
+};
 let revueltoCluster: MeshPhysicalMaterial | null = null;
 
 function createRevueltoClusterMaterial(name: string) {
@@ -151,7 +168,7 @@ let porscheDial: MeshPhysicalMaterial | null = null;
 
 function createPorscheDialMaterial() {
   if (porscheDial) return porscheDial;
-  porscheDial = litClusterMaterial("PorscheDial", porscheDialMap());
+  porscheDial = litClusterMaterial('PorscheDial', porscheDialMap());
   return porscheDial;
 }
 
@@ -170,14 +187,14 @@ function createPorscheBadgeMaterial() {
   map.wrapT = ClampToEdgeWrapping;
   map.needsUpdate = true;
   porscheBadge = new MeshPhysicalMaterial({
-    name: "PorscheBadge",
-    color: "#ffffff",
+    name: 'PorscheBadge',
+    color: '#ffffff',
     map,
     transparent: true,
     alphaTest: 0.4,
     roughness: 0.42,
     metalness: 0.2,
-    emissive: "#ffffff",
+    emissive: '#ffffff',
     emissiveMap: map,
     emissiveIntensity: 0.45,
     envMapIntensity: 0.35,
@@ -191,13 +208,27 @@ function attachPorscheBadge(mesh: Mesh) {
   mesh.userData.porscheBadge = true;
   const height = 0.05;
   const width = height * (442 / 567);
-  const badge = new Mesh(new PlaneGeometry(width, height), createPorscheBadgeMaterial());
-  badge.name = "PorscheBadge";
+  const badge = new Mesh(
+    new PlaneGeometry(width, height),
+    createPorscheBadgeMaterial(),
+  );
+  badge.name = 'PorscheBadge';
   badge.userData.porscheBadgeFace = true;
   badge.position.set(0, -0.0049, 0.071);
   badge.castShadow = false;
   badge.receiveShadow = false;
   mesh.add(badge);
+}
+
+function detachValhallaCluster(root: Object3D) {
+  root.userData.valhallaCluster = false;
+  const stale: Object3D[] = [];
+  root.traverse((object) => {
+    if (object.name === 'ValhallaCluster' || object.userData.valhallaClusterFace) {
+      stale.push(object);
+    }
+  });
+  for (const object of stale) object.parent?.remove(object);
 }
 
 function isPorscheDialFace(cx: number, cy: number, cz: number, nz: number) {
@@ -215,8 +246,8 @@ function attachPorscheDials(mesh: Mesh) {
   if (mesh.userData.porscheDials) return;
   const source = mesh.geometry.clone();
   const index = source.getIndex();
-  const position = source.getAttribute("position");
-  const normal = source.getAttribute("normal");
+  const position = source.getAttribute('position');
+  const normal = source.getAttribute('normal');
   if (!index || !normal) return;
 
   const keep: number[] = [];
@@ -311,7 +342,10 @@ function attachPorscheDials(mesh: Mesh) {
     });
     const span = radius * 2 || 1;
     for (const item of projected) {
-      uvFor.set(item.vertex, [0.5 - item.across / span, 0.5 - item.rise / span]);
+      uvFor.set(item.vertex, [
+        0.5 - item.across / span,
+        0.5 - item.rise / span,
+      ]);
     }
   }
 
@@ -325,7 +359,11 @@ function attachPorscheDials(mesh: Mesh) {
     if (existing !== undefined) return existing;
     const next = positions.length / 3;
     remap.set(vertex, next);
-    positions.push(position.getX(vertex), position.getY(vertex), position.getZ(vertex));
+    positions.push(
+      position.getX(vertex),
+      position.getY(vertex),
+      position.getZ(vertex),
+    );
     normals.push(normal.getX(vertex), normal.getY(vertex), normal.getZ(vertex));
     const coord = uvFor.get(vertex) ?? [0.5, 0.5];
     uvs.push(coord[0], coord[1]);
@@ -340,13 +378,22 @@ function attachPorscheDials(mesh: Mesh) {
   }
 
   const dialGeometry = new BufferGeometry();
-  dialGeometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
-  dialGeometry.setAttribute("normal", new BufferAttribute(new Float32Array(normals), 3));
-  dialGeometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
+  dialGeometry.setAttribute(
+    'position',
+    new BufferAttribute(new Float32Array(positions), 3),
+  );
+  dialGeometry.setAttribute(
+    'normal',
+    new BufferAttribute(new Float32Array(normals), 3),
+  );
+  dialGeometry.setAttribute(
+    'uv',
+    new BufferAttribute(new Float32Array(uvs), 2),
+  );
   dialGeometry.setIndex(indices);
 
   const dialMesh = new Mesh(dialGeometry, createPorscheDialMaterial());
-  dialMesh.name = "PorscheDials";
+  dialMesh.name = 'PorscheDials';
   dialMesh.userData.porscheDialFace = true;
   dialMesh.castShadow = true;
   dialMesh.receiveShadow = true;
@@ -356,7 +403,7 @@ function attachPorscheDials(mesh: Mesh) {
 function createGlassMaterial(name: string, tinted = false) {
   return new MeshPhysicalMaterial({
     name,
-    color: tinted ? "#15191d" : "#9aa7b2",
+    color: tinted ? '#15191d' : '#9aa7b2',
     metalness: tinted ? 0.08 : 0,
     roughness: tinted ? 0.1 : 0.05,
     transparent: true,
@@ -375,7 +422,7 @@ function createGlassMaterial(name: string, tinted = false) {
 function createRubberMaterial(name: string) {
   return new MeshPhysicalMaterial({
     name,
-    color: "#141414",
+    color: '#141414',
     roughness: 0.94,
     metalness: 0,
     envMapIntensity: 0.16,
@@ -387,8 +434,8 @@ let porscheCabin: MeshPhysicalMaterial | null = null;
 function createPorscheCabinMaterial() {
   if (porscheCabin) return porscheCabin;
   porscheCabin = new MeshPhysicalMaterial({
-    name: "Interior2",
-    color: "#101010",
+    name: 'Interior2',
+    color: '#101010',
     roughness: 0.82,
     metalness: 0,
     envMapIntensity: 0.22,
@@ -411,20 +458,20 @@ let carbonTexture: CanvasTexture | null = null;
 
 function getCarbonTexture() {
   if (carbonTexture) return carbonTexture;
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  ctx.fillStyle = "#0b0b0c";
+  ctx.fillStyle = '#0b0b0c';
   ctx.fillRect(0, 0, 256, 256);
   for (let y = 0; y < 256; y += 6) {
     for (let x = 0; x < 256; x += 6) {
       const weave = (Math.floor(x / 6) + Math.floor(y / 6)) % 2 === 0;
-      ctx.fillStyle = weave ? "#1b1b1e" : "#0e0e10";
+      ctx.fillStyle = weave ? '#1b1b1e' : '#0e0e10';
       ctx.fillRect(x, y, 6, 6);
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
       ctx.strokeRect(x + 0.5, y + 0.5, 5, 5);
     }
   }
@@ -439,16 +486,16 @@ function getCarbonTexture() {
 
 export function createPaintMaterial(color: string, finish: FinishId) {
   const spec = finishes[finish];
-  const carbon = finish === "carbon" ? getCarbonTexture() : null;
+  const carbon = finish === 'carbon' ? getCarbonTexture() : null;
   return new MeshPhysicalMaterial({
-    color: carbon ? "#1a1a1a" : color,
+    color: carbon ? '#1a1a1a' : color,
     map: carbon,
     roughness: spec.roughness,
     metalness: spec.metalness,
     clearcoat: spec.clearcoat,
     clearcoatRoughness: spec.clearcoatRoughness,
     envMapIntensity: 1.25,
-    sheen: finish === "metallic" ? 0.15 : 0,
+    sheen: finish === 'metallic' ? 0.15 : 0,
     sheenColor: new Color(color),
   });
 }
@@ -531,15 +578,16 @@ function attachSf25Recolor(
   material.userData.sf25Paint = uPaint;
   material.userData.sf25Recolor = uRecolor;
   material.userData.sf25PaintWhites = uPaintWhites;
-  material.customProgramCacheKey = () => `sf25-livery-${paintWhites ? "w" : "r"}`;
+  material.customProgramCacheKey = () =>
+    `sf25-livery-${paintWhites ? 'w' : 'r'}`;
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uPaint = uPaint;
     shader.uniforms.uRecolor = uRecolor;
     shader.uniforms.uPaintWhites = uPaintWhites;
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", `#include <common>\n${SF25_RECOLOR_GLSL}`)
+      .replace('#include <common>', `#include <common>\n${SF25_RECOLOR_GLSL}`)
       .replace(
-        "#include <map_fragment>",
+        '#include <map_fragment>',
         /* glsl */ `
 #ifdef USE_MAP
 	vec4 sampledDiffuseColor = texture2D( map, vMapUv );
@@ -557,21 +605,29 @@ function attachSf25Recolor(
   material.needsUpdate = true;
 }
 
-function applyMappedFinish(material: Material, color: string, finish: FinishId) {
+function applyMappedFinish(
+  material: Material,
+  color: string,
+  finish: FinishId,
+) {
   const spec = finishes[finish];
   const next = polishMapped(material);
-  if (!(next instanceof MeshStandardMaterial) && !(next instanceof MeshPhysicalMaterial)) return next;
-  next.color = new Color("#ffffff");
+  if (
+    !(next instanceof MeshStandardMaterial) &&
+    !(next instanceof MeshPhysicalMaterial)
+  )
+    return next;
+  next.color = new Color('#ffffff');
   next.roughness = spec.roughness;
   next.metalness = spec.metalness;
   next.envMapIntensity = 1.25;
   if (next instanceof MeshPhysicalMaterial) {
     next.clearcoat = spec.clearcoat;
     next.clearcoatRoughness = spec.clearcoatRoughness;
-    next.sheen = finish === "metallic" ? 0.15 : 0;
+    next.sheen = finish === 'metallic' ? 0.15 : 0;
     next.sheenColor = new Color(color);
   }
-  if (finish === "metallic" || finish === "carbon") next.metalnessMap = null;
+  if (finish === 'metallic' || finish === 'carbon') next.metalnessMap = null;
   return next;
 }
 
@@ -582,10 +638,16 @@ function paintSf25Livery(
   defaultColor: string,
   paintWhites: boolean,
 ) {
-  const paintColor = finish === "carbon" ? "#1a1a1a" : color;
+  const paintColor = finish === 'carbon' ? '#1a1a1a' : color;
   const next = applyMappedFinish(material, paintColor, finish);
-  if (!(next instanceof MeshStandardMaterial) && !(next instanceof MeshPhysicalMaterial)) return next;
-  const skipRecolor = finish !== "carbon" && paintColor.toLowerCase() === defaultColor.toLowerCase();
+  if (
+    !(next instanceof MeshStandardMaterial) &&
+    !(next instanceof MeshPhysicalMaterial)
+  )
+    return next;
+  const skipRecolor =
+    finish !== 'carbon' &&
+    paintColor.toLowerCase() === defaultColor.toLowerCase();
   attachSf25Recolor(next, paintColor, !skipRecolor, paintWhites);
   return next;
 }
@@ -593,7 +655,11 @@ function paintSf25Livery(
 function polishMapped(material: Material) {
   const next = material.clone();
   next.name = material.name;
-  if (!(next instanceof MeshStandardMaterial) && !(next instanceof MeshPhysicalMaterial)) return next;
+  if (
+    !(next instanceof MeshStandardMaterial) &&
+    !(next instanceof MeshPhysicalMaterial)
+  )
+    return next;
 
   sharpenMap(next.map);
   sharpenMap(next.normalMap);
@@ -604,14 +670,20 @@ function polishMapped(material: Material) {
 
   if (/logo/i.test(next.name)) {
     next.transparent = true;
-    next.alphaTest = next.alphaMap || next.alphaTest ? Math.min(next.alphaTest || 0.15, 0.15) : 0.08;
+    next.alphaTest =
+      next.alphaMap || next.alphaTest
+        ? Math.min(next.alphaTest || 0.15, 0.15)
+        : 0.08;
     next.depthWrite = true;
     next.roughness = Math.min(next.roughness, 0.4);
     next.metalness = Math.min(next.metalness, 0.12);
     next.envMapIntensity = 1.15;
   }
 
-  if (/rueda|tire|tyre|llanta|neum/i.test(next.name) && !/logo|FER_SF25_TIRE/i.test(next.name)) {
+  if (
+    /rueda|tire|tyre|llanta|neum/i.test(next.name) &&
+    !/logo|FER_SF25_TIRE/i.test(next.name)
+  ) {
     next.roughness = Math.max(next.roughness, 0.78);
     next.metalness = Math.min(next.metalness, 0.08);
   }
@@ -623,11 +695,11 @@ function hasMaps(material: Material) {
   const mapped = material as MeshStandardMaterial;
   return Boolean(
     mapped.map ||
-      mapped.normalMap ||
-      mapped.roughnessMap ||
-      mapped.metalnessMap ||
-      mapped.emissiveMap ||
-      mapped.aoMap,
+    mapped.normalMap ||
+    mapped.roughnessMap ||
+    mapped.metalnessMap ||
+    mapped.emissiveMap ||
+    mapped.aoMap,
   );
 }
 
@@ -635,10 +707,16 @@ function tintExisting(material: Material, color: string, finish: FinishId) {
   const spec = finishes[finish];
   const next = material.clone();
   next.name = material.name;
-  if (next instanceof MeshStandardMaterial || next instanceof MeshPhysicalMaterial) {
+  if (
+    next instanceof MeshStandardMaterial ||
+    next instanceof MeshPhysicalMaterial
+  ) {
     next.color = new Color(color);
     next.roughness = spec.roughness;
-    next.metalness = finish === "metallic" || finish === "carbon" ? spec.metalness : next.metalness;
+    next.metalness =
+      finish === 'metallic' || finish === 'carbon'
+        ? spec.metalness
+        : next.metalness;
     if (next instanceof MeshPhysicalMaterial) {
       next.clearcoat = spec.clearcoat;
       next.clearcoatRoughness = spec.clearcoatRoughness;
@@ -651,7 +729,7 @@ function tintExisting(material: Material, color: string, finish: FinishId) {
 function styleLocked(name: string) {
   if (/mirror|^chrome/i.test(name)) {
     return new MeshPhysicalMaterial({
-      color: "#c5cdd6",
+      color: '#c5cdd6',
       metalness: 1,
       roughness: 0.05,
       envMapIntensity: 1.8,
@@ -659,7 +737,7 @@ function styleLocked(name: string) {
   }
   if (/cf|carbon/i.test(name)) {
     return new MeshPhysicalMaterial({
-      color: "#141414",
+      color: '#141414',
       map: getCarbonTexture(),
       metalness: 0.7,
       roughness: 0.32,
@@ -669,17 +747,17 @@ function styleLocked(name: string) {
   }
   if (/dry|rubber|rueda/i.test(name)) {
     return new MeshPhysicalMaterial({
-      color: "#111111",
+      color: '#111111',
       roughness: 0.92,
       metalness: 0.02,
     });
   }
   if (/tire|rim|wheel/i.test(name)) {
-    return createRimMaterial("#b8bcc2");
+    return createRimMaterial('#b8bcc2');
   }
   if (/sw_|disp|btn/i.test(name)) {
     return new MeshPhysicalMaterial({
-      color: /disp/i.test(name) ? "#0a1220" : "#1a1a1a",
+      color: /disp/i.test(name) ? '#0a1220' : '#1a1a1a',
       roughness: 0.45,
       metalness: 0.2,
     });
@@ -691,7 +769,11 @@ function setMaterials(mesh: Mesh, next: Material[]) {
   mesh.material = next.length === 1 ? next[0] : next;
 }
 
-export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuild) {
+export function applyCarBuild(
+  root: Object3D,
+  car: CarDefinition,
+  build: CarBuild,
+) {
   root.traverse((object) => {
     const mesh = object as Mesh;
     if (!mesh.isMesh) return;
@@ -699,47 +781,66 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
-    if (car.slug === "ferrari-sf25") {
+    if (car.slug === 'ferrari-sf25') {
       if (/BODY_44/i.test(mesh.name)) mesh.visible = false;
       if (/BODY_16/i.test(mesh.name)) mesh.visible = true;
     }
-    if (car.slug === "aston-martin-valhalla" && /^Object_(62|65|68|71|74|77)$/.test(mesh.name)) {
-      mesh.visible = false;
+    if (
+      car.slug === 'aston-martin-valhalla' &&
+      /^Object_(62|65|68|71|74|77)$/.test(mesh.name)
+    ) {
+      mesh.visible = true;
     }
 
-    const current = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    const current = Array.isArray(mesh.material)
+      ? mesh.material
+      : [mesh.material];
     const next = current.map((material) => {
-      const matName = material?.name || "";
+      const matName = material?.name || '';
       if (mesh.userData.porscheDialFace) {
         return createPorscheDialMaterial();
       }
       if (mesh.userData.porscheBadgeFace) {
         return createPorscheBadgeMaterial();
       }
-      if (car.slug === "ferrari-enzo" && isTyreRubber(matName)) {
+      if (car.slug === 'ferrari-enzo' && isTyreRubber(matName)) {
         return createRubberMaterial(matName);
       }
-      if (car.slug === "ferrari-enzo" && isInstrumentCluster(matName)) {
+      if (car.slug === 'ferrari-enzo' && isInstrumentCluster(matName)) {
         fitEnzoCluster(mesh);
         return createEnzoClusterMaterial(matName);
       }
-      if (car.slug === "lamborghini-revuelto" && mesh.name === "GaugeCluster_Screen") {
+      if (
+        car.slug === 'lamborghini-revuelto' &&
+        mesh.name === 'GaugeCluster_Screen'
+      ) {
         return createRevueltoClusterMaterial(matName);
       }
-      if (car.slug === "ferrari-enzo" && /logo perfil/i.test(matName)) {
+      if (car.slug === 'ferrari-enzo' && /logo perfil/i.test(matName)) {
         return hideMaterial(matName);
       }
-      if (car.slug === "porsche-gt4" && isTyreRubber(matName)) {
+      if (car.slug === 'porsche-gt4' && isTyreRubber(matName)) {
         return createRubberMaterial(matName);
       }
-      if (car.slug === "porsche-gt4" && matName === "Chrome1" && /steer/i.test(mesh.name)) {
+      if (
+        car.slug === 'porsche-gt4' &&
+        matName === 'Chrome1' &&
+        /steer/i.test(mesh.name)
+      ) {
         attachPorscheBadge(mesh);
       }
-      if (car.slug === "porsche-gt4" && matName === "Headlight" && /_body/i.test(mesh.name)) {
+      if (
+        car.slug === 'porsche-gt4' &&
+        matName === 'Headlight' &&
+        /_body/i.test(mesh.name)
+      ) {
         attachPorscheDials(mesh);
         return createPorscheCabinMaterial();
       }
-      if (car.slug === "porsche-gt4" && (matName === "Interior2" || mesh.userData.porscheDials)) {
+      if (
+        car.slug === 'porsche-gt4' &&
+        (matName === 'Interior2' || mesh.userData.porscheDials)
+      ) {
         return createPorscheCabinMaterial();
       }
       if (isGlass(matName)) {
@@ -756,17 +857,18 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
 
       const group = firstMatch(mesh, matName, car.paintGroups);
       if (group) {
-        const color = build.paints[group.id] || car.defaultPaints[group.id] || "#FF2800";
-        if (car.slug === "ferrari-sf25" && hasMaps(material)) {
+        const color =
+          build.paints[group.id] || car.defaultPaints[group.id] || '#FF2800';
+        if (car.slug === 'ferrari-sf25' && hasMaps(material)) {
           return paintSf25Livery(
             material,
             color,
             build.finish,
-            car.defaultPaints[group.id] || "#FF2800",
+            car.defaultPaints[group.id] || '#FF2800',
             /FrontWing|Nose|RearWing|RearFlap|DRS/i.test(mesh.name),
           );
         }
-        if (hasMaps(material) && build.finish !== "carbon") {
+        if (hasMaps(material) && build.finish !== 'carbon') {
           return tintExisting(material, color, build.finish);
         }
         const painted = createPaintMaterial(color, build.finish);
@@ -781,21 +883,26 @@ export function applyCarBuild(root: Object3D, car: CarDefinition, build: CarBuil
     setMaterials(mesh, next);
 
     if (car.hideWhenAftermarket) {
-      const updated = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((material) => {
-        if (!matchesRule(mesh, material.name || "", car.hideWhenAftermarket)) return material;
+      const updated = (
+        Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      ).map((material) => {
+        if (!matchesRule(mesh, material.name || '', car.hideWhenAftermarket))
+          return material;
         const copy = material.clone();
-        copy.visible = build.wheel !== "aftermarket";
-        copy.transparent = build.wheel === "aftermarket";
-        copy.opacity = build.wheel === "aftermarket" ? 0 : 1;
+        copy.visible = build.wheel !== 'aftermarket';
+        copy.transparent = build.wheel === 'aftermarket';
+        copy.opacity = build.wheel === 'aftermarket' ? 0 : 1;
         return copy;
       });
       setMaterials(mesh, updated);
     }
   });
 
+  if (car.slug === 'aston-martin-valhalla') detachValhallaCluster(root);
+
   for (const part of car.aeroParts) {
     root.traverse((object) => {
-      if (matchesRule(object, "", part)) {
+      if (matchesRule(object, '', part)) {
         object.visible = build.aero[part.id] ?? part.defaultVisible;
       }
     });

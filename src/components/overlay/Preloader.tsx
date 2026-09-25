@@ -1,10 +1,18 @@
 import { useProgress } from "@react-three/drei";
+import { Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { carPreviewUrl } from "../../lib/constants";
 import { preloadModels } from "../../lib/models";
-import type { Brand } from "../../lib/schema";
+import type { Brand, CarHistory } from "../../lib/schema";
 import { cn } from "@/lib/utils";
-import { BrandMark } from "./BrandMark";
+import { BrandMark, brandLabel } from "./BrandMark";
+
+export interface PreloaderCar {
+  slug: string;
+  name: string;
+  year: string;
+  brand: Brand;
+}
 
 function describeLoad(item: string, progress: number) {
   const name = item.toLowerCase();
@@ -32,14 +40,21 @@ export function Preloader({
   subtitle,
   slug,
   brand,
+  history,
+  roster,
+  stamp,
   models,
   onDone,
 }: {
   label?: string;
   name?: string;
+  year?: string;
   subtitle?: string;
   slug?: string;
   brand?: Brand;
+  history?: CarHistory;
+  roster?: PreloaderCar[];
+  stamp?: string;
   models?: string[];
   onDone?: () => void;
 }) {
@@ -93,9 +108,9 @@ export function Preloader({
   useEffect(() => {
     if (!copyIn || peeling) return;
     if (!settled && percent < 100) return;
-    const peel = window.setTimeout(() => setPeeling(true), 700);
+    const peel = window.setTimeout(() => setPeeling(true), history || roster?.length ? 2800 : 700);
     return () => window.clearTimeout(peel);
-  }, [copyIn, peeling, settled, percent]);
+  }, [copyIn, history, peeling, roster, settled, percent]);
 
   useEffect(() => {
     if (!peeling) return;
@@ -133,43 +148,85 @@ export function Preloader({
           )}
         />
       ) : null}
-      <div className="grid h-full place-items-center">
+      <div className="grid h-full place-items-center px-6">
         <div
           className={cn(
-            "preloader-copy w-[min(22rem,calc(100vw-2.5rem))] space-y-5",
+            "preloader-copy w-[min(58rem,calc(100vw-3rem))] space-y-5",
+            (history || roster?.length) && "preloader-copy--dossier",
             copyIn && !peeling && "is-visible",
             peeling && "is-leaving",
           )}
         >
-          {slug ? (
-            <img
-              src={carPreviewUrl(slug)}
-              alt=""
-              className="aspect-[960/589] w-full rounded-md object-cover"
-              draggable={false}
-            />
-          ) : null}
-          <div className="space-y-1.5">
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs font-medium tracking-[0.16em] text-white uppercase">
-              <span>{label}</span>
-              {name ? (
-                <span className="text-sm tracking-normal text-white normal-case">
-                  {name}
-                  {subtitle ? ` ${subtitle}` : ""}
-                </span>
-              ) : null}
-            </p>
-            <p className="text-lg font-medium tracking-tight text-white">{status}</p>
-          </div>
-          <div className="space-y-2">
-            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-[#cfff00] transition-[width] duration-200 ease-out"
-                style={{ width: `${percent}%` }}
+          <div className="space-y-5">
+            {slug ? (
+              <img
+                src={carPreviewUrl(slug)}
+                alt=""
+                className="aspect-[960/589] w-full rounded-md object-cover"
+                draggable={false}
               />
+            ) : null}
+            <div className="space-y-1.5">
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs font-medium tracking-[0.16em] text-white uppercase">
+                <span>{label}</span>
+                {name ? (
+                  <span className="text-sm tracking-normal text-white normal-case">
+                    {name}
+                    {subtitle ? ` ${subtitle}` : ""}
+                  </span>
+                ) : null}
+              </p>
+              <p className="text-lg font-medium tracking-tight text-white">{status}</p>
             </div>
-            <p className="text-muted-foreground text-xs tabular-nums">{percent}%</p>
+            <div className="space-y-2">
+              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="bg-primary h-full rounded-full transition-[width] duration-200 ease-out"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <p className="text-muted-foreground text-xs tabular-nums">{percent}%</p>
+            </div>
           </div>
+          {history ? (
+            <aside className={cn("preloader-dossier", !roster?.length && "is-compact")} aria-label="Car history">
+              <div className="preloader-dossier-top">
+                <h2 className="preloader-dossier-title">{history.headline}</h2>
+                <span className="preloader-dossier-stamp btn-chrome is-steady is-pill" aria-label={stamp ?? "Archive"}>
+                  <Info aria-hidden />
+                </span>
+              </div>
+              {history.kicker ? <p className="preloader-dossier-kicker">{history.kicker}</p> : null}
+              <div className="sound-console-well">
+                <p className="preloader-dossier-body">{history.body}</p>
+                {roster?.length ? (
+                  <ol className="preloader-dossier-list">
+                    {roster.map((car) => (
+                      <li key={car.slug} className="sound-console-row">
+                        <span className="preloader-roster-name">
+                          <BrandMark brand={car.brand} className="preloader-roster-mark" />
+                          <span>
+                            {brandLabel[car.brand]} {car.name}
+                          </span>
+                        </span>
+                        <span className="preloader-roster-year">{car.year}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : null}
+                {history.facts?.length ? (
+                  <dl className="preloader-dossier-list">
+                    {history.facts.map((fact) => (
+                      <div key={fact.label} className="sound-console-row">
+                        <dt>{fact.label}</dt>
+                        <dd>{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
+              </div>
+            </aside>
+          ) : null}
         </div>
       </div>
     </div>

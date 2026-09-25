@@ -29,6 +29,16 @@ export const chevroletZr1 = defineCar({
       { label: "Drivetrain", value: "Front-engine, rear-wheel drive" },
     ],
   },
+  history: {
+    kicker: "2019 · Bowling Green",
+    headline: "Return of the King",
+    body: "Chevrolet introduced the 2019 Corvette ZR1 as the fastest, most powerful production Corvette of its day. The hand-built LT5 supercharged V8 continued the ZR1 King of the Hill line that began with the C6.",
+    facts: [
+      { label: "Engine", value: "LT5 supercharged V8" },
+      { label: "Output", value: "755 hp" },
+      { label: "On sale", value: "2018" },
+    ],
+  },
   model: CHEVROLET_ZR1_MODEL,
   targetLength: 4.57,
   defaultFinish: "matte",

@@ -1,4 +1,4 @@
-import { Box3, Vector3, type Mesh, type Object3D } from "three";
+import { AnimationClip, AnimationMixer, Box3, Vector3, type Mesh, type Object3D } from "three";
 import type { CarDefinition } from "./schema";
 
 const box = new Box3();
@@ -61,6 +61,15 @@ function lowestPoint(root: Object3D, detect?: string) {
   }
 
   return minY;
+}
+
+/** Valhalla's rear wing is skinned; without this clip the bind pose leaves it floating. */
+export function poseClosedSpoilers(root: Object3D, clips: AnimationClip[]) {
+  const clip = clips.find((entry) => /SpoilerClose/i.test(entry.name));
+  if (!clip) return;
+  const mixer = new AnimationMixer(root);
+  mixer.clipAction(clip).play();
+  mixer.setTime(clip.duration);
 }
 
 export function frameModel(root: Object3D, car: CarDefinition) {

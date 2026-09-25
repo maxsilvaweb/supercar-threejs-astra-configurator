@@ -29,6 +29,16 @@ export const porscheGt4 = defineCar({
       { label: "Drivetrain", value: "Mid-engine, rear-wheel drive" },
     ],
   },
+  history: {
+    kicker: "2015 · Weissach",
+    headline: "First Cayman in the GT family",
+    body: "Porsche introduced the Cayman GT4 as the first GT sports car based on the Cayman, developed by the Motorsport department in Weissach. It uses a 3.8-litre flat-six from the 911 Carrera S and a six-speed manual only.",
+    facts: [
+      { label: "Debut", value: "Geneva 2015" },
+      { label: "Nordschleife", value: "7:40" },
+      { label: "Gearbox", value: "6-speed manual" },
+    ],
+  },
   model: PORSCHE_GT4_MODEL,
   targetLength: 4.46,
   defaultFinish: "gloss",

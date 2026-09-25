@@ -29,6 +29,16 @@ export const lamborghiniRevuelto = defineCar({
       { label: "Drivetrain", value: "Mid-engine, all-wheel drive" },
     ],
   },
+  history: {
+    kicker: "2023 · Sant’Agata",
+    headline: "First V12 hybrid HPEV",
+    body: "Unveiled in Lamborghini’s 60th anniversary year, Revuelto succeeds the Aventador as the first super sports V12 plug-in hybrid HPEV. The name comes from a Spanish fighting bull.",
+    facts: [
+      { label: "Successor to", value: "Aventador" },
+      { label: "Powertrain", value: "V12 + 3 motors" },
+      { label: "Combined", value: "1,015 CV" },
+    ],
+  },
   model: LAMBORGHINI_REVUELTO_MODEL,
   targetLength: 4.95,
   defaultFinish: "gloss",

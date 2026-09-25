@@ -74,6 +74,14 @@ export interface CarSpec {
   details: CarSpecFact[];
 }
 
+/** Published history shown on the configure preloader. Do not invent figures. */
+export interface CarHistory {
+  kicker: string;
+  headline: string;
+  body: string;
+  facts?: CarSpecFact[];
+}
+
 export interface CarDefinition {
   slug: string;
   brand: Brand;
@@ -81,6 +89,7 @@ export interface CarDefinition {
   year: string;
   tagline: string;
   spec?: CarSpec;
+  history?: CarHistory;
   model: string;
   comingSoon?: boolean;
   hidden?: boolean;

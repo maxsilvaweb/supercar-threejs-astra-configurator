@@ -34,37 +34,35 @@ export function CabinStartButton({ visible }: { visible: boolean }) {
   };
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-40">
-      <button
-        type="button"
-        className={cn("cabin-start pointer-events-auto", running && "is-running")}
-        aria-pressed={running}
-        aria-label={running ? "Stop engine" : "Start engine"}
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={toggle}
-      >
+    <button
+      type="button"
+      className={cn("cabin-start pointer-events-auto self-center", running && "is-running")}
+      aria-pressed={running}
+      aria-label={running ? "Stop engine" : "Start engine"}
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={toggle}
+    >
         <svg viewBox="0 0 512 512" aria-hidden>
-          <defs>
-            <pattern id={patternId} patternUnits="userSpaceOnUse" width="72" height="72">
-              <image href="/ui/carbon.png" width="72" height="72" />
-              <rect width="72" height="72" fill={`url(#${patternId}-shade)`} />
-            </pattern>
-            <linearGradient id={`${patternId}-shade`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
-              <stop offset="42%" stopColor="#ffffff" stopOpacity="0" />
-              <stop offset="100%" stopColor="#000000" stopOpacity="0.55" />
-            </linearGradient>
-          </defs>
-          <circle cx="256" cy="256" r="224" fill={`url(#${patternId})`} />
-          <path fill="#141416" fillRule="evenodd" d={RING} />
-          <circle className="cabin-start-tint" cx="256" cy="256" r="218.5" />
-          <path className="cabin-start-lamp" d={LAMP} />
-        </svg>
-        <span className="cabin-start-copy">
-          <span className="cabin-start-label">{running ? "STOP" : "START"}</span>
-          <span className="cabin-start-sub">Ignition</span>
-        </span>
-      </button>
-    </div>
+        <defs>
+          <pattern id={patternId} patternUnits="userSpaceOnUse" width="72" height="72">
+            <image href="/ui/carbon.png" width="72" height="72" />
+            <rect width="72" height="72" fill={`url(#${patternId}-shade)`} />
+          </pattern>
+          <linearGradient id={`${patternId}-shade`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
+            <stop offset="42%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.55" />
+          </linearGradient>
+        </defs>
+        <circle cx="256" cy="256" r="224" fill={`url(#${patternId})`} />
+        <path fill="#141416" fillRule="evenodd" d={RING} />
+        <circle className="cabin-start-tint" cx="256" cy="256" r="218.5" />
+        <path className="cabin-start-lamp" d={LAMP} />
+      </svg>
+      <span className="cabin-start-copy">
+        <span className="cabin-start-label">{running ? "STOP" : "START"}</span>
+        <span className="cabin-start-sub">Ignition</span>
+      </span>
+    </button>
   );
 }

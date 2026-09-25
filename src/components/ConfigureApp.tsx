@@ -7,6 +7,8 @@ import { preloadSounds } from "../lib/play-one-shot-sound";
 import { useConfig } from "../lib/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MenuClickSounds } from "./overlay/MenuClickSounds";
+import { canEnterCabin } from "./overlay/CabinExitButton";
+import { CabinStartButton } from "./overlay/CabinStartButton";
 import { SoundPanel } from "./overlay/SoundPanel";
 import { Tuner } from "./overlay/Tuner";
 import { HotspotLayer } from "./overlay/HotspotLayer";
@@ -39,6 +41,8 @@ export function ConfigureApp({ slug }: { slug: string }) {
   const desktop = useDesktopGate();
   const car = getCar(slug);
   const [revealed, setRevealed] = useState(false);
+  const interior = useConfig((state) => state.cameraPreset === "interior");
+  const cabinSide = useConfig((state) => state.cabinSide);
 
   useEffect(() => {
     if (!slug) return;
@@ -82,14 +86,20 @@ export function ConfigureApp({ slug }: { slug: string }) {
           <HotspotLayer>
             <StudioCanvas car={car} />
             <Tuner car={car} revealed={revealed} />
-            <SoundPanel visible={revealed} ambience />
+            <SoundPanel visible={revealed} ambience>
+              <CabinStartButton
+                visible={revealed && interior && cabinSide === "right" && canEnterCabin(car)}
+              />
+            </SoundPanel>
           </HotspotLayer>
           <Preloader
             label="Configure"
             slug={car.slug}
             brand={car.brand}
             name={car.name}
+            year={car.year}
             subtitle={car.tagline}
+            history={car.history}
             models={configureModelUrls(car.model)}
             onDone={() => {
               setRevealed(true);
