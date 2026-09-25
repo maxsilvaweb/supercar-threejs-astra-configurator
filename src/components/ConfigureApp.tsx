@@ -13,8 +13,8 @@ import { SoundPanel } from "./overlay/SoundPanel";
 import { Tuner } from "./overlay/Tuner";
 import { HotspotLayer } from "./overlay/HotspotLayer";
 import { Preloader } from "./overlay/Preloader";
-import { StudioCanvas } from "./studio/garage/StudioCanvas";
-import { MobileBlock } from "./overlay/MobileBlock";
+import { ConfigGarageCanvas } from "./garage/ConfigGarageCanvas";
+import { MobileDialog } from "./overlay/MobileDialog";
 import { useDesktopGate } from "../lib/desktop";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string }> {
@@ -61,7 +61,7 @@ export function ConfigureApp({ slug }: { slug: string }) {
   if (!desktop) {
     return (
       <TooltipProvider>
-        <MobileBlock />
+        <MobileDialog />
       </TooltipProvider>
     );
   }
@@ -85,7 +85,7 @@ export function ConfigureApp({ slug }: { slug: string }) {
         <MenuClickSounds />
         <main className="relative h-dvh overflow-hidden">
           <HotspotLayer>
-            <StudioCanvas car={car} />
+            <ConfigGarageCanvas car={car} />
             <Tuner car={car} revealed={revealed} />
             <SoundPanel visible={revealed} ambience>
               <CabinStartButton

@@ -56,6 +56,7 @@ export const INTERFACE_SFX_STORAGE_KEY = "car-modeler-interface-sfx";
 export const ENGINE_SFX_STORAGE_KEY = "car-modeler-engine-sfx";
 export const STUDIO_INFO_STORAGE_KEY = "car-modeler-studio-info";
 export const STUDIO_ACCENT_STORAGE_KEY = "car-modeler-studio-accent";
+export const WAREHOUSE_LIGHTS_STORAGE_KEY = "car-modeler-warehouse-lights";
 
 export const FERRARI_SF25_MODEL = "/models/ferrari-sf25/ferrari-sf25.glb?v=2";
 export const CHEVROLET_ZR1_MODEL = "/models/chevrolet-zr1/chevrolet-zr1.glb?v=2";

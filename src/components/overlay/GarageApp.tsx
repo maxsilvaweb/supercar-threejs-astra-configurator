@@ -13,7 +13,7 @@ import { INTERFACE_SOUNDS, STUDIO_GARAGE_ENTRY, STUDIO_GARAGE_ENTRY_VOLUME, STUD
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { cn } from "@/lib/utils";
-import { GarageCanvas } from "../studio/warehouse/GarageCanvas";
+import { WarehouseCanvas } from "../warehouse/WarehouseCanvas";
 import { BrandMark } from "./BrandMark";
 import { SpecHighlights } from "./CarSpec";
 import { HotspotLayer } from "./HotspotLayer";
@@ -21,8 +21,8 @@ import { MenuClickSounds } from "./MenuClickSounds";
 import { Preloader } from "./Preloader";
 import { SoundPanel } from "./SoundPanel";
 import { SavedBuilds } from "./SavedBuilds";
-import { StudioInfoDialog } from "./StudioInfoDialog";
-import { MobileBlock } from "./MobileBlock";
+import { WarehouseInfoDialog } from "./WarehouseInfoDialog";
+import { MobileDialog } from "./MobileDialog";
 import { useDesktopGate } from "../../lib/desktop";
 
 export function GarageApp() {
@@ -66,7 +66,7 @@ export function GarageApp() {
   if (!desktop) {
     return (
       <TooltipProvider>
-        <MobileBlock />
+        <MobileDialog />
       </TooltipProvider>
     );
   }
@@ -76,7 +76,7 @@ export function GarageApp() {
       <MenuClickSounds />
       <main className="relative h-dvh overflow-hidden">
         <HotspotLayer>
-        <GarageCanvas
+        <WarehouseCanvas
           focused={focused}
           hovered={hovered}
           selected={selected}
@@ -129,8 +129,8 @@ export function GarageApp() {
         </div>
         ) : null}
 
-        <SoundPanel visible={ready} />
-        <StudioInfoDialog
+        <SoundPanel visible={ready} lights />
+        <WarehouseInfoDialog
           open={ready && infoOpen}
           onProceed={() => {
             window.localStorage.setItem(STUDIO_INFO_STORAGE_KEY, "1");

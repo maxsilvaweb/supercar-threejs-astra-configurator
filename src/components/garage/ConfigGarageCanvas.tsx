@@ -4,7 +4,7 @@ import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import CameraControlsImpl from "camera-controls";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Box3, BoxGeometry, Mesh, MeshBasicMaterial, Vector3, type Group, type PerspectiveCamera as PerspectiveCameraType } from "three";
-import { cabinBounds, cabinLookAround, cabinView, type CabinSide } from "../../../lib/cabin";
+import { cabinBounds, cabinLookAround, cabinView, type CabinSide } from "../../lib/cabin";
 import {
   CABIN_LOOK_AHEAD,
   CONFIG_BAY as BAY,
@@ -12,13 +12,13 @@ import {
   CONFIG_CAMERA_MIN_DISTANCE,
   CONFIG_CAR_SCALE as CAR_SCALE,
   CONFIG_ROOM as ROOM,
-} from "../../../lib/constants";
-import { rightHandDoorApproach } from "../../../lib/camera-paths";
-import { applyOverlayView, useOverlayFrame } from "../../../lib/overlay-frame";
-import { sitOnGround } from "../../../lib/framing";
-import type { CameraPreset, CarDefinition } from "../../../lib/schema";
-import { useConfig } from "../../../lib/store";
-import { CarModel } from "../CarModel";
+} from "../../lib/constants";
+import { rightHandDoorApproach } from "../../lib/camera-paths";
+import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
+import { sitOnGround } from "../../lib/framing";
+import type { CameraPreset, CarDefinition } from "../../lib/schema";
+import { useConfig } from "../../lib/store";
+import { CarModel } from "../car/CarModel";
 import { ConfigGarage } from "./ConfigGarage";
 import { DoorHotspots } from "./DoorHotspots";
 import { IgnitionHotspot } from "./IgnitionHotspot";
@@ -285,7 +285,7 @@ declare global {
   }
 }
 
-export function StudioCanvas({ car }: { car: CarDefinition }) {
+export function ConfigGarageCanvas({ car }: { car: CarDefinition }) {
   return (
     <Canvas
       className="absolute inset-0"

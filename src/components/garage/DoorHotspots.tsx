@@ -1,13 +1,13 @@
 import { DoorOpen, Pointer } from "lucide-react";
 import { useEffect } from "react";
 import type { Group } from "three";
-import { doorHotspotPoint } from "../../../lib/hotspot";
-import { QUICK_WOOSH } from "../../../lib/constants";
-import { playOneShotSound, preloadSound } from "../../../lib/play-one-shot-sound";
-import type { CarDoor, CarDefinition } from "../../../lib/schema";
-import { useConfig } from "../../../lib/store";
-import { CarHotspot } from "../CarHotspot";
-import { SceneOrb } from "../SceneOrb";
+import { doorHotspotPoint } from "../../lib/hotspot";
+import { QUICK_WOOSH } from "../../lib/constants";
+import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
+import type { CarDoor, CarDefinition } from "../../lib/schema";
+import { useConfig } from "../../lib/store";
+import { SceneOrb } from "../car/SceneOrb";
+import { CarHotspot } from "./CarHotspot";
 
 export function DoorHotspots({
   car,

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { accents, getAccent, setAccent, subscribeAccent, type AccentId } from "../../lib/accent";
+import { getWarehouseLights, setWarehouseLights, subscribeWarehouseLights } from "../../lib/warehouse-lights";
 import { getAnalyser, getVolume, isMuted, resumeAudio, setMuted, setVolume, subscribeMute, subscribeVolume } from "../../lib/audio-bus";
 import {
   isGarageAmbienceEnabled,
@@ -103,10 +104,12 @@ function useEngineSfx() {
 export function SoundPanel({
   visible = true,
   ambience = false,
+  lights = false,
   children,
 }: {
   visible?: boolean;
   ambience?: boolean;
+  lights?: boolean;
   children?: ReactNode;
 }) {
   const muted = useMuted();
@@ -201,8 +204,42 @@ export function SoundPanel({
         </div>
       </div>
       <AccentPanel />
+      {lights ? <LightPanel /> : null}
       </div>
       {children}
+    </div>
+  );
+}
+
+function useWarehouseLights() {
+  const [level, setLevel] = useState(getWarehouseLights);
+  useEffect(() => subscribeWarehouseLights(setLevel), []);
+  return level;
+}
+
+function LightPanel() {
+  const level = useWarehouseLights();
+
+  return (
+    <div className="surface-carbon w-0 min-w-full rounded-xl border border-white/12 px-2 py-2 shadow-lg">
+      <div className="sound-console-well">
+        <div className="sound-console-row">
+          <span className="text-[0.7rem] tracking-wide whitespace-nowrap text-white/80">Lights</span>
+          <Slider
+            className="w-28"
+            min={0}
+            max={100}
+            step={1}
+            value={[Math.round(level * 100)]}
+            aria-label="Warehouse lights"
+            onValueChange={(next) => {
+              const amount = next[0];
+              if (amount === undefined) return;
+              setWarehouseLights(amount / 100);
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

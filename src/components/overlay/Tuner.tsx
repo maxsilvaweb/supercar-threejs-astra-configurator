@@ -11,7 +11,7 @@ import { useConfig } from "../../lib/store";
 import { BrandMark } from "./BrandMark";
 import { SpecSheet, SpecSummary } from "./CarSpec";
 import { CabinExitButton, canEnterCabin } from "./CabinExitButton";
-import { wheels } from "../studio/wheels";
+import { wheels } from "../garage/Wheels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

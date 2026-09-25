@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { useLayoutEffect, useMemo } from "react";
 import { Box3, MeshStandardMaterial, type Group, type Mesh, type Object3D, Vector3 } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { CONFIG_GARAGE_MIN_HEIGHT as MIN_HEIGHT, CONFIG_GARAGE_MODEL as ROOM_URL } from "../../../lib/constants";
+import { CONFIG_GARAGE_MIN_HEIGHT as MIN_HEIGHT, CONFIG_GARAGE_MODEL as ROOM_URL } from "../../lib/constants";
 const box = new Box3();
 const center = new Vector3();
 const vertex = new Vector3();

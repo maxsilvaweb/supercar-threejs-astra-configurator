@@ -1,5 +1,5 @@
 import { useGLTF } from "@react-three/drei";
-import { useLayoutEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import {
   Box3,
   Color,
@@ -10,7 +10,8 @@ import {
   Vector3,
 } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { STUDIO_GARAGE_MIN_HEIGHT as MIN_HEIGHT, STUDIO_GARAGE_MODEL as GARAGE_URL } from "../../../lib/constants";
+import { STUDIO_GARAGE_MIN_HEIGHT as MIN_HEIGHT, STUDIO_GARAGE_MODEL as GARAGE_URL } from "../../lib/constants";
+import { getWarehouseLights } from "../../lib/warehouse-lights";
 const box = new Box3();
 const center = new Vector3();
 
@@ -36,18 +37,22 @@ function styleGarage(root: Object3D, cinematic: boolean) {
       return;
     }
 
-    const isLight = /жарык|lamp|light/.test(name);
-
     materials.forEach((material, index) => {
       if (!(material instanceof MeshStandardMaterial)) return;
+      const glow =
+        material.emissiveIntensity > 0.4 &&
+        material.emissive.r + material.emissive.g + material.emissive.b > 0.2;
+      const isLight = /жарык|lamp|light/.test(name) || glow;
       const styled = material.clone();
       const mapped = Boolean(styled.map || styled.normalMap || styled.roughnessMap);
 
       if (isLight) {
-        styled.emissive = new Color(cinematic ? "#dce8ff" : "#f0f4ff");
-        styled.emissiveIntensity = mapped ? (cinematic ? 2.4 : 1.6) : light;
+        const lamp = glow ? material.emissiveIntensity : mapped ? (cinematic ? 2.4 : 1.6) : light;
+        styled.userData.warehouseLamp = lamp;
+        if (!glow) styled.emissive = new Color(cinematic ? "#dce8ff" : "#f0f4ff");
+        styled.emissiveIntensity = lamp * getWarehouseLights();
         styled.toneMapped = false;
-        if (!mapped) {
+        if (!mapped && !glow) {
           styled.color = new Color("#f4f7ff");
           styled.roughness = 0.18;
           styled.metalness = 0.05;
@@ -112,7 +117,21 @@ function frameGarage(root: Group) {
   root.updateMatrixWorld(true);
 }
 
-export function GarageRoom({ cinematic }: { cinematic: boolean }) {
+function applyLampLevel(root: Object3D, level: number) {
+  root.traverse((object) => {
+    const mesh = object as Mesh;
+    if (!mesh.isMesh) return;
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const material of materials) {
+      if (!(material instanceof MeshStandardMaterial)) continue;
+      const lamp = material.userData.warehouseLamp;
+      if (typeof lamp !== "number") continue;
+      material.emissiveIntensity = lamp * level;
+    }
+  });
+}
+
+export function WarehouseRoom({ cinematic, level }: { cinematic: boolean; level: number }) {
   const { scene } = useGLTF(GARAGE_URL);
   const root = useMemo(() => clone(scene) as Group, [scene]);
 
@@ -120,6 +139,10 @@ export function GarageRoom({ cinematic }: { cinematic: boolean }) {
     frameGarage(root);
     styleGarage(root, cinematic);
   }, [cinematic, root]);
+
+  useEffect(() => {
+    applyLampLevel(root, level);
+  }, [level, root]);
 
   return <primitive object={root} />;
 }

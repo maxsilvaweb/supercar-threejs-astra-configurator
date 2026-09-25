@@ -2,8 +2,9 @@ import { ContactShadows, Environment, MeshReflectorMaterial, PerspectiveCamera, 
 import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Outline, Select, Selection, Vignette } from "@react-three/postprocessing";
 import { Pointer, Wrench } from "lucide-react";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { getAccent, subscribeAccent } from "../../../lib/accent";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { getAccent, subscribeAccent } from "../../lib/accent";
+import { getWarehouseLights, subscribeWarehouseLights } from "../../lib/warehouse-lights";
 import {
   Raycaster,
   Vector2,
@@ -11,7 +12,7 @@ import {
   type PerspectiveCamera as PerspectiveCameraType,
   Vector3,
 } from "three";
-import { listConfigurableCars } from "../../../cars";
+import { listConfigurableCars } from "../../cars";
 import {
   GARAGE_BAY_FACE as FACE,
   GARAGE_BAY_SPACING as BAY_SPACING,
@@ -19,13 +20,13 @@ import {
   GARAGE_HOME_LOOK,
   GARAGE_HOME_POSITION,
   GARAGE_LINE as LINE,
-} from "../../../lib/constants";
-import { applyOverlayView, useOverlayFrame } from "../../../lib/overlay-frame";
-import { garageModelUrls, prefetchCar, prefetchConfigure, preloadModels } from "../../../lib/models";
-import { createDefaultBuild } from "../../../lib/schema";
-import { CarModel } from "../CarModel";
-import { GarageRoom } from "./GarageRoom";
-import { SceneOrb } from "../SceneOrb";
+} from "../../lib/constants";
+import { applyOverlayView, useOverlayFrame } from "../../lib/overlay-frame";
+import { garageModelUrls, prefetchCar, prefetchConfigure, preloadModels } from "../../lib/models";
+import { createDefaultBuild } from "../../lib/schema";
+import { CarModel } from "../car/CarModel";
+import { SceneOrb } from "../car/SceneOrb";
+import { WarehouseRoom } from "./WarehouseRoom";
 
 const garageCars = listConfigurableCars();
 const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBuild(car)]));
@@ -382,6 +383,14 @@ function ParkedCars({
   );
 }
 
+function WarehouseExposure({ level }: { level: number }) {
+  const scene = useThree((state) => state.scene);
+  useLayoutEffect(() => {
+    scene.environmentIntensity = 0.3 + level * 0.7;
+  }, [level, scene]);
+  return null;
+}
+
 function Scene({
   focused,
   hovered,
@@ -395,32 +404,36 @@ function Scene({
 }) {
   const [pointed, setPointed] = useState<string>();
   const [accent, setAccentColour] = useState(getAccent);
+  const [lights, setLights] = useState(getWarehouseLights);
   const hover = useStickyPoint(setPointed);
   useEffect(() => subscribeAccent(setAccentColour), []);
+  useEffect(() => subscribeWarehouseLights(setLights), []);
   const highlighted = hovered || pointed;
   const cinematic = Boolean(selected);
+  const glow = 0.2 + lights * 0.8;
 
   return (
     <Selection>
       <CanvasPointerBridge focused={focused} onLeave={hover.release} onSelect={onSelect} />
       <color attach="background" args={[cinematic ? "#07080c" : "#0b0b0b"]} />
       <fog attach="fog" args={[cinematic ? "#07080c" : "#0b0b0b", 18, 40]} />
-      <ambientLight intensity={cinematic ? 0.2 : 0.32} />
+      <WarehouseExposure level={lights} />
+      <ambientLight intensity={(cinematic ? 0.2 : 0.32) * glow} />
       <spotLight
         position={[4, 4.2, 3]}
         angle={0.55}
         penumbra={0.75}
-        intensity={cinematic ? 2.2 : 1.8}
+        intensity={(cinematic ? 2.2 : 1.8) * lights}
         color={cinematic ? "#d5e2ff" : "#ffffff"}
       />
       <spotLight
         position={[-4, 3.8, 1]}
         angle={0.5}
         penumbra={0.8}
-        intensity={cinematic ? 1 : 0.9}
+        intensity={(cinematic ? 1 : 0.9) * lights}
         color={cinematic ? "#9fb4d8" : "#cfd6e4"}
       />
-      <pointLight position={[0, 3.8, 0]} intensity={4.5} distance={16} color="#f3f6ff" />
+      <pointLight position={[0, 3.8, 0]} intensity={4.5 * lights} distance={16} color="#f3f6ff" />
       <Suspense fallback={null}>
         <Environment
           preset={cinematic ? "city" : "warehouse"}
@@ -429,7 +442,7 @@ function Scene({
           resolution={128}
         />
         {cinematic ? <GarageFloor cinematic /> : null}
-        <GarageRoom cinematic={cinematic} />
+        <WarehouseRoom cinematic={cinematic} level={lights} />
         <ParkedCars hovered={hovered} pointed={pointed} hover={hover} onSelect={onSelect} />
       </Suspense>
       {!cinematic ? (
@@ -437,7 +450,7 @@ function Scene({
       ) : null}
       <DriftCamera focused={focused} />
       <EffectComposer disableNormalPass multisampling={0} autoClear={false}>
-        <Bloom intensity={cinematic ? 0.38 : 0.28} luminanceThreshold={cinematic ? 0.55 : 0.7} mipmapBlur />
+        <Bloom intensity={(cinematic ? 0.38 : 0.28) * glow} luminanceThreshold={cinematic ? 0.55 : 0.7} mipmapBlur />
         <Outline
           edgeStrength={highlighted ? 5.4 : 0}
           pulseSpeed={highlighted ? 0.7 : 0}
@@ -452,7 +465,7 @@ function Scene({
   );
 }
 
-export function GarageCanvas({
+export function WarehouseCanvas({
   focused,
   hovered,
   selected,
