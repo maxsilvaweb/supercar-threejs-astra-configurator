@@ -51,8 +51,8 @@ const caymanBay = row[2];
 const revueltoBay = row[3];
 const ROW_GAP = 6.7;
 const middleRowFocus = {
-  position: [0, 2.4, 4.2] as [number, number, number],
-  look: [0, 0.7, 0.6] as [number, number, number],
+  position: [0, 3.2, 5.9] as [number, number, number],
+  look: [0, 0.12, -0.2] as [number, number, number],
 };
 const middleZ = sf25Bay.position[2] - ROW_GAP;
 const backZ = middleZ - ROW_GAP;
