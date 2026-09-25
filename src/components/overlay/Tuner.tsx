@@ -114,11 +114,19 @@ function SwatchRow({
   );
 }
 
+function defaultPaintGroup(car: CarDefinition) {
+  return car.paintGroups.find((group) => group.id === "body")?.id || car.paintGroups[0]?.id || "";
+}
+
 function PaintPanel({ car }: { car: CarDefinition }) {
   const paints = useConfig((state) => state.paints);
   const setPaint = useConfig((state) => state.setPaint);
-  const [groupId, setGroupId] = useState(car.paintGroups[0]?.id || "");
-  const active = car.paintGroups.find((group) => group.id === groupId) || car.paintGroups[0];
+  const [groupId, setGroupId] = useState(() => defaultPaintGroup(car));
+  const active = car.paintGroups.find((group) => group.id === groupId) || car.paintGroups.find((group) => group.id === "body") || car.paintGroups[0];
+
+  useEffect(() => {
+    setGroupId(defaultPaintGroup(car));
+  }, [car]);
 
   if (!active) {
     return <p className="text-muted-foreground">No paint groups defined for this model.</p>;
@@ -348,7 +356,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
           <Button variant="secondary" size="sm" className="btn-chrome" asChild>
             <a href="/">
               <ArrowLeft data-icon="inline-start" />
-              Back to Studio Warehouse
+              Back to Warehouse
             </a>
           </Button>
           <Button

@@ -8,6 +8,7 @@ export const brandLabel: Record<Brand, string> = {
   chevrolet: "Chevrolet",
   "aston-martin": "Aston Martin",
   toyota: "Toyota",
+  bugatti: "Bugatti",
 };
 
 export const brandMark: Record<Brand, string> = {
@@ -17,6 +18,7 @@ export const brandMark: Record<Brand, string> = {
   chevrolet: "/ui/brands/chevrolet.svg",
   "aston-martin": "/ui/brands/aston-martin.svg?v=2",
   toyota: "/ui/brands/toyota.svg",
+  bugatti: "/ui/brands/bugatti.svg",
 };
 
 export function BrandMark({ brand, className }: { brand: Brand; className?: string }) {

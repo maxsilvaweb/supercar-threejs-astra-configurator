@@ -1,4 +1,4 @@
-export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota";
+export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota" | "bugatti";
 
 export type FinishId = "gloss" | "satin" | "matte" | "metallic" | "carbon";
 
@@ -97,6 +97,8 @@ export interface CarDefinition {
   hidden?: boolean;
   targetLength: number;
   yaw?: number;
+  /** Extra metres after the tyres are seated, so they meet a floor above the model origin. */
+  groundLift?: number;
   paintGroups: PaintGroup[];
   locked?: NameMatch[];
   aeroParts: AeroPart[];

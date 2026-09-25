@@ -868,6 +868,11 @@ export function applyCarBuild(
             /FrontWing|Nose|RearWing|RearFlap|DRS/i.test(mesh.name),
           );
         }
+        if (car.slug === 'bugatti-chiron' && group.id === 'body') {
+          const painted = createPaintMaterial(color, build.finish);
+          painted.name = matName;
+          return painted;
+        }
         if (hasMaps(material) && build.finish !== 'carbon') {
           return tintExisting(material, color, build.finish);
         }

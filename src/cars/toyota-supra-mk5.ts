@@ -40,6 +40,7 @@ export const toyotaSupraMk5 = defineCar({
   },
   model: TOYOTA_SUPRA_MK5_MODEL,
   targetLength: 4.05,
+  groundLift: 0.038,
   defaultFinish: "gloss",
   rideHeight: false,
   wheelDetect: "tire",

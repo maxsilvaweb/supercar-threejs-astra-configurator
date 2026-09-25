@@ -99,6 +99,7 @@ export function frameModel(root: Object3D, car: CarDefinition) {
 
   const ground = lowestPoint(root, car.wheelDetect);
   root.position.y -= ground - 0.006;
+  if (car.groundLift) root.position.y += car.groundLift;
   root.updateMatrixWorld(true);
 }
 

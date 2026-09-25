@@ -48,6 +48,7 @@ const row = [
 const sf25Bay = row[0];
 const enzoBay = row[1];
 const caymanBay = row[2];
+const revueltoBay = row[3];
 const backRowFocus = {
   position: [0, 1.35, 6.5] as [number, number, number],
   look: [0, 0.78, 1.2] as [number, number, number],
@@ -79,6 +80,15 @@ const bays = [
     reserved: false,
     shift: 0,
     position: [caymanBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
+  },
+  {
+    slug: "bugatti-chiron",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [revueltoBay.position[0], 0, sf25Bay.position[2] - 10] as [number, number, number],
     rotation: FACE,
     focus: backRowFocus,
   },
