@@ -73,6 +73,8 @@ export function poseClosedSpoilers(root: Object3D, clips: AnimationClip[]) {
 }
 
 export function frameModel(root: Object3D, car: CarDefinition) {
+  const parent = root.parent;
+  parent?.remove(root);
   root.position.set(0, 0, 0);
   root.rotation.set(0, car.yaw ?? 0, 0);
   root.scale.setScalar(1);
@@ -101,6 +103,7 @@ export function frameModel(root: Object3D, car: CarDefinition) {
   root.position.y -= ground - 0.006;
   if (car.groundLift) root.position.y += car.groundLift;
   root.updateMatrixWorld(true);
+  parent?.add(root);
 }
 
 export function sitOnGround(root: Object3D, floorY = 0, detect?: string) {

@@ -2,7 +2,7 @@ import { Component, useEffect, useState, type ReactNode } from "react";
 import { getCar } from "../cars";
 import { INTERFACE_SOUNDS, STUDIO_SOUNDS } from "../lib/constants";
 import { preloadGarageAmbience, startGarageAmbience, stopGarageAmbience } from "../lib/garage-ambience";
-import { configureModelUrls } from "../lib/models";
+import { configureModelUrls, prefetchCar } from "../lib/models";
 import { preloadSounds, preloadSoundsLater } from "../lib/play-one-shot-sound";
 import { useConfig } from "../lib/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,26 +37,76 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string }
   }
 }
 
-export function ConfigureApp({ slug }: { slug: string }) {
+const readyCars = new Set<string>();
+
+function slugFromLocation() {
+  const match = window.location.pathname.match(/\/configure\/([^/]+)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : "";
+}
+
+function showCar(slug: string) {
+  const next = getCar(slug);
+  if (!next || next.comingSoon) return false;
+  const buildId = new URLSearchParams(window.location.search).get("build");
+  prefetchCar(next);
+  document.title = `${next.name} · silvaweb`;
+  if (buildId && useConfig.getState().loadBuild(buildId)) return true;
+  useConfig.getState().loadCar(slug);
+  return true;
+}
+
+export function ConfigureApp({ slug: initialSlug }: { slug: string }) {
   const desktop = useDesktopGate();
+  const [slug, setSlug] = useState(initialSlug);
+  const [pendingSlug, setPendingSlug] = useState<string | null>(null);
   const car = getCar(slug);
   const [revealed, setRevealed] = useState(false);
   const interior = useConfig((state) => state.cameraPreset === "interior");
   const cabinSide = useConfig((state) => state.cabinSide);
 
   useEffect(() => {
-    if (!slug) return;
-    const buildId = new URLSearchParams(window.location.search).get("build");
-    if (buildId && useConfig.getState().loadBuild(buildId)) return;
-    useConfig.getState().loadCar(slug);
-  }, [slug]);
+    const fromUrl = slugFromLocation();
+    if (fromUrl && showCar(fromUrl)) setSlug(fromUrl);
+    else if (initialSlug) showCar(initialSlug);
+
+    const onPop = () => {
+      const nextSlug = slugFromLocation();
+      if (!nextSlug || !showCar(nextSlug)) return;
+      setSlug(nextSlug);
+      setRevealed(false);
+      setPendingSlug(readyCars.has(nextSlug) ? null : nextSlug);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [initialSlug]);
 
   useEffect(() => {
     preloadSounds(INTERFACE_SOUNDS);
-    preloadSoundsLater([...STUDIO_SOUNDS, car?.doorSound, car?.ignition?.sound]);
     preloadGarageAmbience();
     return () => stopGarageAmbience();
+  }, []);
+
+  useEffect(() => {
+    preloadSoundsLater([...STUDIO_SOUNDS, car?.doorSound, car?.ignition?.sound]);
   }, [car]);
+
+  const selectCar = (nextSlug: string) => {
+    if (nextSlug === slug) return;
+    const next = getCar(nextSlug);
+    if (!next || next.comingSoon) return;
+    prefetchCar(next);
+    useConfig.getState().loadCar(nextSlug);
+    document.title = `${next.name} · silvaweb`;
+    history.pushState({ configureSlug: nextSlug }, "", `/configure/${nextSlug}`);
+    setRevealed(false);
+    setSlug(nextSlug);
+    setPendingSlug(readyCars.has(nextSlug) ? null : nextSlug);
+  };
+
+  const carReady = (ready: { slug: string }) => {
+    readyCars.add(ready.slug);
+    setPendingSlug((current) => (current === ready.slug ? null : current));
+  };
 
   if (!desktop) {
     return (
@@ -85,8 +135,8 @@ export function ConfigureApp({ slug }: { slug: string }) {
         <MenuClickSounds />
         <main className="relative h-dvh overflow-hidden">
           <HotspotLayer>
-            <ConfigGarageCanvas car={car} />
-            <Tuner car={car} revealed={revealed} />
+            <ConfigGarageCanvas car={car} onCarReady={carReady} />
+            <Tuner car={car} revealed={revealed} pendingSlug={pendingSlug} onSelectCar={selectCar} />
             <SoundPanel visible={revealed} ambience>
               <CabinStartButton
                 visible={revealed && interior && cabinSide === "right" && canEnterCabin(car)}
@@ -94,6 +144,7 @@ export function ConfigureApp({ slug }: { slug: string }) {
             </SoundPanel>
           </HotspotLayer>
           <Preloader
+            key={car.slug}
             label="Configure"
             slug={car.slug}
             brand={car.brand}

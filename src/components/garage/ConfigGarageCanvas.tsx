@@ -2,7 +2,7 @@ import { CameraControls, Environment, PerspectiveCamera } from "@react-three/dre
 import { Canvas, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import CameraControlsImpl from "camera-controls";
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Box3, BoxGeometry, Mesh, MeshBasicMaterial, Vector3, type Group, type PerspectiveCamera as PerspectiveCameraType } from "three";
 import { cabinBounds, cabinLookAround, cabinView, type CabinSide } from "../../lib/cabin";
 import {
@@ -248,9 +248,39 @@ function GroundedCar({ car, carRef }: { car: CarDefinition; carRef: React.RefObj
   );
 }
 
-function Scene({ car }: { car: CarDefinition }) {
+function SettledCar({
+  car,
+  carRef,
+  onReady,
+}: {
+  car: CarDefinition;
+  carRef: React.RefObject<Group | null>;
+  onReady: (car: CarDefinition) => void;
+}) {
+  useEffect(() => {
+    onReady(car);
+  }, [car, onReady]);
+
+  return (
+    <>
+      <GroundedCar car={car} carRef={carRef} />
+      <DoorHotspots car={car} carRef={carRef} />
+      <IgnitionHotspot car={car} carRef={carRef} />
+    </>
+  );
+}
+
+function Scene({ car, onCarReady }: { car: CarDefinition; onCarReady?: (car: CarDefinition) => void }) {
   const carRef = useRef<Group>(null);
+  const heldRef = useRef<Group>(null);
   const colliders = useMemo(() => createRoomColliders(), []);
+  const [held, setHeld] = useState(car);
+  const readyRef = useRef(onCarReady);
+  readyRef.current = onCarReady;
+  const settle = useCallback((next: CarDefinition) => {
+    setHeld(next);
+    readyRef.current?.(next);
+  }, []);
 
   return (
     <>
@@ -262,9 +292,9 @@ function Scene({ car }: { car: CarDefinition }) {
       <Suspense fallback={null}>
         <Environment preset="warehouse" background={false} blur={0.65} resolution={128} />
         <ConfigGarage />
-        <GroundedCar car={car} carRef={carRef} />
-        <DoorHotspots car={car} carRef={carRef} />
-        <IgnitionHotspot car={car} carRef={carRef} />
+      </Suspense>
+      <Suspense fallback={held.slug === car.slug ? null : <GroundedCar car={held} carRef={heldRef} />}>
+        <SettledCar car={car} carRef={carRef} onReady={settle} />
       </Suspense>
       {colliders.map((mesh, index) => (
         <primitive key={index} object={mesh} />
@@ -285,14 +315,20 @@ declare global {
   }
 }
 
-export function ConfigGarageCanvas({ car }: { car: CarDefinition }) {
+export function ConfigGarageCanvas({
+  car,
+  onCarReady,
+}: {
+  car: CarDefinition;
+  onCarReady?: (car: CarDefinition) => void;
+}) {
   return (
     <Canvas
       className="absolute inset-0"
       dpr={[1, 2]}
       gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance", stencil: false }}
     >
-      <Scene car={car} />
+      <Scene car={car} onCarReady={onCarReady} />
     </Canvas>
   );
 }

@@ -1,8 +1,10 @@
 import { ArrowLeft, Ban, ChevronsLeft, ChevronsRight, PanelLeft, RotateCw, Save } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { listConfigurableCars } from "../../cars";
 import { paintSwatches, rimSwatches } from "../../lib/colors";
 import { preloadSound } from "../../lib/play-one-shot-sound";
-import { IMPACT_DRILL, SPRAY_PAINT } from "../../lib/constants";
+import { carPreviewUrl, IMPACT_DRILL, SPRAY_PAINT } from "../../lib/constants";
+import { prefetchCar } from "../../lib/models";
 import { isSideOverlay, watchOverlayOpen } from "../../lib/overlay-frame";
 import { studioPanelClass, studioToggleClass } from "../../lib/studio-overlay";
 import { finishOrder, finishes } from "../../lib/finishes";
@@ -261,15 +263,88 @@ function SectionBody({ car, section }: { car: CarDefinition; section: SectionId 
   );
 }
 
-export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?: boolean }) {
+function CarRoster({
+  car,
+  onSelectCar,
+}: {
+  car: CarDefinition;
+  onSelectCar: (slug: string) => void;
+}) {
+  const currentRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const node = currentRef.current;
+    const scroller = node?.parentElement;
+    if (!node || !scroller) return;
+    const left = node.offsetLeft - (scroller.clientWidth - node.offsetWidth) / 2;
+    scroller.scrollTo({ left: Math.max(0, left) });
+  }, [car.slug]);
+
+  return (
+    <div className="mb-6">
+      <p className="mb-2 text-xs font-medium tracking-[0.16em] text-white uppercase">Switch car</p>
+      <div className="flex items-start gap-2 overflow-x-auto overscroll-x-contain px-0.5 py-1">
+        {listConfigurableCars().map((entry) => {
+          const selected = entry.slug === car.slug;
+          return (
+            <button
+              key={entry.slug}
+              ref={selected ? currentRef : undefined}
+              type="button"
+              aria-pressed={selected}
+              aria-label={`Switch to ${entry.name}`}
+              title={`Switch to ${entry.name}`}
+              className={cn(
+                "group w-36 shrink-0 overflow-hidden rounded-md bg-white/5 text-left ring-2 transition-colors",
+                selected ? "ring-primary" : "ring-white/20 hover:ring-primary",
+              )}
+              onMouseEnter={() => prefetchCar(entry)}
+              onFocus={() => prefetchCar(entry)}
+              onClick={() => onSelectCar(entry.slug)}
+            >
+              <img
+                src={carPreviewUrl(entry.slug)}
+                alt=""
+                className={cn(
+                  "block h-auto w-full transition duration-200",
+                  selected
+                    ? ""
+                    : "grayscale group-hover:grayscale-0 group-focus-visible:grayscale-0",
+                )}
+              />
+              <span className="block truncate px-2 py-1.5 text-xs text-white">{entry.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export function Tuner({
+  car,
+  revealed = true,
+  pendingSlug = null,
+  onSelectCar,
+}: {
+  car: CarDefinition;
+  revealed?: boolean;
+  pendingSlug?: string | null;
+  onSelectCar: (slug: string) => void;
+}) {
   const state = useConfig();
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState<SectionId>(car.paintGroups.length > 0 ? "paint" : "spec");
+  const pending = pendingSlug ? listConfigurableCars().find((entry) => entry.slug === pendingSlug) : undefined;
 
   useEffect(() => {
     preloadSound(IMPACT_DRILL);
     preloadSound(SPRAY_PAINT);
   }, []);
+
+  useEffect(() => {
+    setSection(car.paintGroups.length > 0 ? "paint" : "spec");
+  }, [car]);
 
   useEffect(() => {
     if (!revealed) return;
@@ -351,6 +426,13 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
           {car.tagline ? <span className="text-muted-foreground"> {car.tagline}</span> : null}
         </h1>
         {car.spec ? <SpecSummary facts={car.spec.summary} /> : null}
+
+        <CarRoster car={car} onSelectCar={onSelectCar} />
+        {pending ? (
+          <p className="text-muted-foreground mb-6 text-sm" role="status">
+            Loading {pending.name}
+          </p>
+        ) : null}
 
         <div className="mb-8 flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="btn-chrome" asChild>
