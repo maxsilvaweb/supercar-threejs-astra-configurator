@@ -176,7 +176,7 @@ function SectionBody({ car, section }: { car: CarDefinition; section: SectionId 
           onValueChange={(value) => value && state.setFinish(value as typeof state.finish)}
           className="flex-wrap justify-start gap-2"
         >
-          {finishOrder.map((id) => (
+          {(car.finishes ?? finishOrder).map((id) => (
             <ToggleGroupItem key={id} value={id}>
               {finishes[id].label}
             </ToggleGroupItem>

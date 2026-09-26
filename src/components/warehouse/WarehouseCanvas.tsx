@@ -56,6 +56,10 @@ const middleRowFocus = {
 };
 const middleZ = sf25Bay.position[2] - ROW_GAP;
 const backZ = middleZ - ROW_GAP;
+const backRowFocus = {
+  position: [2.4, 1.55, 5.2] as [number, number, number],
+  look: [0.2, 0.42, 1.5] as [number, number, number],
+};
 const bays = [
   ...row,
   {
@@ -94,8 +98,26 @@ const bays = [
     rotation: FACE,
     focus: middleRowFocus,
   },
-  ...[sf25Bay, enzoBay, caymanBay, revueltoBay].map((bay, index) => ({
-    slug: `row-3-${index + 1}`,
+  {
+    slug: "lamborghini-temerario",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [sf25Bay.position[0], 0, backZ] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
+  },
+  {
+    slug: "mclaren-765lt",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [enzoBay.position[0], 0, backZ] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
+  },
+  ...[caymanBay, revueltoBay].map((bay, index) => ({
+    slug: `row-3-${index + 3}`,
     empty: true,
     reserved: true,
     shift: 0,

@@ -9,6 +9,7 @@ export const brandLabel: Record<Brand, string> = {
   "aston-martin": "Aston Martin",
   toyota: "Toyota",
   bugatti: "Bugatti",
+  mclaren: "McLaren",
 };
 
 export const brandMark: Record<Brand, string> = {
@@ -19,10 +20,11 @@ export const brandMark: Record<Brand, string> = {
   "aston-martin": "/ui/brands/aston-martin.svg?v=2",
   toyota: "/ui/brands/toyota.svg",
   bugatti: "/ui/brands/bugatti.svg",
+  mclaren: "/ui/brands/mclaren.svg?v=3",
 };
 
 export function BrandMark({ brand, className }: { brand: Brand; className?: string }) {
-  const wide = brand === "aston-martin";
+  const wide = brand === "aston-martin" || brand === "mclaren";
   return (
     <img
       src={brandMark[brand]}

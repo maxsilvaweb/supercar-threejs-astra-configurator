@@ -52,6 +52,7 @@ export function carPreviewUrl(slug: string) {
 const backdropVersion: Record<string, number> = {
   "lamborghini-revuelto": 2,
   "bugatti-chiron": 3,
+  "mclaren-765lt": 2,
 };
 
 export function carBackdropUrl(slug: string) {
@@ -76,6 +77,8 @@ export const BUGATTI_CHIRON_MODEL = "/models/bugatti-chiron/bugatti-chiron.glb?v
 export const FERRARI_ENZO_MODEL = "/models/ferrari-enzo/ferrari-enzo.glb?v=3";
 export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=2";
 export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=2";
+export const LAMBORGHINI_TEMERARIO_MODEL = "/models/lamborghini-temerario/lamborghini-temerario.glb?v=1";
+export const MCLAREN_765LT_MODEL = "/models/mclaren-765lt/mclaren-765lt.glb?v=2";
 export const LAMBORGHINI_REVUELTO_CLUSTER = "/ui/dials/lamborghini-revuelto.jpg";
 export const PORSCHE_GT4_CLUSTER = "/ui/dials/porsche-gt4.jpg?v=3";
 export const PORSCHE_GT4_BADGE = "/ui/brands/porsche-crest.png";

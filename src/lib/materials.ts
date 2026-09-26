@@ -5,6 +5,7 @@ import {
   ClampToEdgeWrapping,
   Color,
   DoubleSide,
+  LinearSRGBColorSpace,
   Mesh,
   MeshPhysicalMaterial,
   PlaneGeometry,
@@ -484,6 +485,305 @@ function getCarbonTexture() {
   return carbonTexture;
 }
 
+type TrimMaps = { color: Texture; normal: Texture };
+
+const MCLAREN_INTERIOR_MAP = '/models/mclaren-765lt/textures/interior.png';
+const MCLAREN_GRILLE_MAP = '/models/mclaren-765lt/textures/grille.png';
+const MCLAREN_CARBON_MAP = '/models/mclaren-765lt/textures/carbon.jpg';
+const MCLAREN_CARBON_NORMAL = '/models/mclaren-765lt/textures/carbon-normal.png';
+
+const trimCache = new Map<string, MeshPhysicalMaterial>();
+
+function shade(x: number, y: number) {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+function valueNoise(x: number, y: number) {
+  const xi = Math.floor(x);
+  const yi = Math.floor(y);
+  const xf = x - xi;
+  const yf = y - yi;
+  const sx = xf * xf * (3 - 2 * xf);
+  const sy = yf * yf * (3 - 2 * yf);
+  return (
+    shade(xi, yi) * (1 - sx) * (1 - sy) +
+    shade(xi + 1, yi) * sx * (1 - sy) +
+    shade(xi, yi + 1) * (1 - sx) * sy +
+    shade(xi + 1, yi + 1) * sx * sy
+  );
+}
+
+function fbm(x: number, y: number, octaves: number) {
+  let value = 0;
+  let amplitude = 0.5;
+  let frequency = 1;
+  let total = 0;
+  for (let i = 0; i < octaves; i += 1) {
+    value += amplitude * valueNoise(x * frequency, y * frequency);
+    total += amplitude;
+    amplitude *= 0.5;
+    frequency *= 2;
+  }
+  return value / total;
+}
+
+function canvasTexture(canvas: HTMLCanvasElement, colorSpace: typeof LinearSRGBColorSpace) {
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = colorSpace;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.anisotropy = 8;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function leatherMaps(kind: 'leather' | 'suede'): TrimMaps {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const normalCanvas = document.createElement('canvas');
+  normalCanvas.width = size;
+  normalCanvas.height = size;
+  const height = new Float32Array(size * size);
+
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const crease = fbm(x / 42, y / 42, 4);
+      const pore = fbm(x / 7, y / 7, 3);
+      const fiber = fbm(x / 2.2, y / 2.2, 2);
+      height[y * size + x] =
+        kind === 'leather'
+          ? crease * 0.62 + pore * 0.28 + fiber * 0.1
+          : fiber * 0.72 + pore * 0.28;
+    }
+  }
+
+  const colorCtx = canvas.getContext('2d');
+  const normalCtx = normalCanvas.getContext('2d');
+  if (!colorCtx || !normalCtx) {
+    const empty = canvasTexture(canvas, LinearSRGBColorSpace);
+    return { color: empty, normal: empty };
+  }
+
+  const colorImage = colorCtx.createImageData(size, size);
+  const normalImage = normalCtx.createImageData(size, size);
+  const sample = (x: number, y: number) =>
+    height[((y + size) % size) * size + ((x + size) % size)];
+
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const h = sample(x, y);
+      const tone =
+        kind === 'leather' ? Math.round(70 + h * 185) : Math.round(110 + h * 145);
+      const i = (y * size + x) * 4;
+      colorImage.data[i] = tone;
+      colorImage.data[i + 1] = tone;
+      colorImage.data[i + 2] = tone;
+      colorImage.data[i + 3] = 255;
+
+      const dx = sample(x + 1, y) - sample(x - 1, y);
+      const dy = sample(x, y + 1) - sample(x, y - 1);
+      const strength = kind === 'leather' ? 7.5 : 4.2;
+      const nx = -dx * strength;
+      const ny = -dy * strength;
+      const nz = 1;
+      const length = Math.hypot(nx, ny, nz);
+      normalImage.data[i] = Math.round((nx / length) * 127 + 128);
+      normalImage.data[i + 1] = Math.round((ny / length) * 127 + 128);
+      normalImage.data[i + 2] = Math.round((nz / length) * 127 + 128);
+      normalImage.data[i + 3] = 255;
+    }
+  }
+
+  colorCtx.putImageData(colorImage, 0, 0);
+  normalCtx.putImageData(normalImage, 0, 0);
+  return {
+    color: canvasTexture(canvas, LinearSRGBColorSpace),
+    normal: canvasTexture(normalCanvas, LinearSRGBColorSpace),
+  };
+}
+
+const TRIPLANAR_PARS = /* glsl */ `
+varying vec3 vTriPos;
+varying vec3 vTriNormal;
+uniform sampler2D uTriColor;
+uniform sampler2D uTriNormal;
+uniform float uTriScale;
+vec3 triBlend(vec3 nrm) {
+  vec3 blend = pow(abs(normalize(nrm)), vec3(3.0));
+  return blend / (blend.x + blend.y + blend.z);
+}
+vec4 triSample(sampler2D tex, vec3 pos, vec3 blend) {
+  vec4 x = texture2D(tex, pos.zy * uTriScale);
+  vec4 y = texture2D(tex, pos.xz * uTriScale);
+  vec4 z = texture2D(tex, pos.xy * uTriScale);
+  return x * blend.x + y * blend.y + z * blend.z;
+}
+`;
+
+function attachTriplanar(material: MeshPhysicalMaterial, maps: TrimMaps, scale: number) {
+  material.customProgramCacheKey = () => `mclaren-triplanar-${scale}`;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uTriColor = { value: maps.color };
+    shader.uniforms.uTriNormal = { value: maps.normal };
+    shader.uniforms.uTriScale = { value: scale };
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vTriPos;\nvarying vec3 vTriNormal;')
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+	vTriPos = position;
+	vTriNormal = normal;`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>\n${TRIPLANAR_PARS}`)
+      .replace(
+        '#include <map_fragment>',
+        /* glsl */ `
+	vec3 triWeights = triBlend(vTriNormal);
+	vec4 sampledDiffuseColor = triSample(uTriColor, vTriPos, triWeights);
+	diffuseColor *= sampledDiffuseColor;
+`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        /* glsl */ `
+#include <normal_fragment_maps>
+	{
+		vec3 triWeights = triBlend(vTriNormal);
+		vec3 slope = triSample(uTriNormal, vTriPos, triWeights).xyz * 2.0 - 1.0;
+		normal = normalize(normal + slope * 0.4);
+	}
+`,
+      );
+  };
+  return material;
+}
+
+function repeatMap(url: string, colorSpace: typeof SRGBColorSpace | typeof LinearSRGBColorSpace) {
+  const texture = loadTexture(url, colorSpace);
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.flipY = false;
+  return texture;
+}
+
+let mclarenInterior: MeshPhysicalMaterial | null = null;
+let mclarenGrille: MeshPhysicalMaterial | null = null;
+
+function mclarenInteriorAtlas() {
+  if (mclarenInterior) return mclarenInterior;
+  const map = loadTexture(MCLAREN_INTERIOR_MAP, SRGBColorSpace);
+  map.wrapS = ClampToEdgeWrapping;
+  map.wrapT = ClampToEdgeWrapping;
+  map.flipY = false;
+  const material = new MeshPhysicalMaterial({
+    name: 'Interior',
+    color: '#ffffff',
+    map,
+    roughness: 0.68,
+    metalness: 0.02,
+    envMapIntensity: 0.35,
+    side: DoubleSide,
+  });
+  material.customProgramCacheKey = () => 'mclaren-interior-atlas';
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <map_fragment>',
+      /* glsl */ `
+#ifdef USE_MAP
+	vec2 atlasUv = vMapUv;
+	if (atlasUv.x < 0.0 || atlasUv.x > 1.0 || atlasUv.y < 0.0 || atlasUv.y > 1.0) {
+		diffuseColor.rgb *= vec3(0.07, 0.066, 0.062);
+	} else {
+		vec4 sampledDiffuseColor = texture2D( map, atlasUv );
+		diffuseColor *= sampledDiffuseColor;
+	}
+#endif
+`,
+    );
+  };
+  mclarenInterior = material;
+  return material;
+}
+
+function mclarenGrilleMap() {
+  if (mclarenGrille) return mclarenGrille;
+  const map = repeatMap(MCLAREN_GRILLE_MAP, SRGBColorSpace);
+  mclarenGrille = new MeshPhysicalMaterial({
+    name: 'Grille',
+    color: '#d5d5d5',
+    map,
+    roughness: 0.42,
+    metalness: 0.72,
+    envMapIntensity: 0.8,
+    side: DoubleSide,
+  });
+  return mclarenGrille;
+}
+
+function carbonFileMaps(): TrimMaps {
+  return {
+    color: repeatMap(MCLAREN_CARBON_MAP, SRGBColorSpace),
+    normal: repeatMap(MCLAREN_CARBON_NORMAL, LinearSRGBColorSpace),
+  };
+}
+
+function createMclarenTrim(name: string) {
+  const key = /grille/i.test(name)
+    ? 'grille'
+    : /carbon/i.test(name)
+      ? 'carbon'
+      : /grey/i.test(name)
+        ? 'grey'
+        : /leather/i.test(name)
+          ? 'leather'
+          : 'interior';
+  if (key === 'interior') return mclarenInteriorAtlas();
+  if (key === 'grille') return mclarenGrilleMap();
+  const cached = trimCache.get(key);
+  if (cached) return cached;
+
+  const leather = key === 'leather' || key === 'grey';
+  const maps = key === 'carbon' ? carbonFileMaps() : leatherMaps(leather ? 'leather' : 'suede');
+  const material = new MeshPhysicalMaterial({
+    name:
+      key === 'grille'
+        ? 'Grille'
+        : key === 'carbon'
+          ? 'Carbon Fiber'
+          : key === 'grey'
+            ? 'Leather Genuine Grey'
+            : key === 'leather'
+              ? 'Leather Genuine Black'
+              : 'Interior',
+    color:
+      key === 'grey'
+        ? '#7d746b'
+        : key === 'leather'
+          ? '#4e4741'
+          : key === 'carbon'
+            ? '#ffffff'
+            : key === 'grille'
+              ? '#2a2a2a'
+              : '#5c554e',
+    roughness: key === 'carbon' ? 0.46 : key === 'grille' ? 0.48 : leather ? 0.62 : 0.88,
+    metalness: key === 'carbon' ? 0.28 : key === 'grille' ? 0.35 : 0,
+    envMapIntensity: key === 'carbon' ? 0.55 : leather ? 0.45 : 0.22,
+    clearcoat: key === 'carbon' ? 0.4 : leather ? 0.18 : 0,
+    clearcoatRoughness: key === 'carbon' ? 0.22 : 0.46,
+    sheen: leather ? 0.45 : 0.08,
+    sheenRoughness: 0.5,
+    sheenColor: new Color('#8a7d72'),
+    side: DoubleSide,
+  });
+  const scale = key === 'carbon' ? 8 : leather ? 3.2 : 5.5;
+  trimCache.set(key, attachTriplanar(material, maps, scale));
+  return material;
+}
+
 export function createPaintMaterial(color: string, finish: FinishId) {
   const spec = finishes[finish];
   const carbon = finish === 'carbon' ? getCarbonTexture() : null;
@@ -846,6 +1146,9 @@ export function applyCarBuild(
       if (isGlass(matName)) {
         return createGlassMaterial(matName);
       }
+      if (car.slug === 'mclaren-765lt' && /interior|leather|grille|carbon/i.test(matName)) {
+        return createMclarenTrim(matName);
+      }
 
       const locked = firstMatch(mesh, matName, car.locked || []);
       if (locked) {
@@ -868,7 +1171,12 @@ export function applyCarBuild(
             /FrontWing|Nose|RearWing|RearFlap|DRS/i.test(mesh.name),
           );
         }
-        if (car.slug === 'bugatti-chiron' && group.id === 'body') {
+        if (
+          (car.slug === 'bugatti-chiron' ||
+            car.slug === 'lamborghini-temerario' ||
+            car.slug === 'mclaren-765lt') &&
+          group.id === 'body'
+        ) {
           const painted = createPaintMaterial(color, build.finish);
           painted.name = matName;
           return painted;

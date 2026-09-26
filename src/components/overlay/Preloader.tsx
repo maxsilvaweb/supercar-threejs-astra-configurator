@@ -193,7 +193,7 @@ export function Preloader({
           brand={brand}
           className={cn(
             "preloader-mark h-auto",
-            brand === "aston-martin"
+            brand === "aston-martin" || brand === "mclaren"
               ? "top-8 left-8 w-[min(32rem,62vw)]"
               : "top-[-7rem] left-[-6rem] w-[min(46rem,78vw)]",
             copyIn && "is-visible",

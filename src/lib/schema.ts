@@ -1,4 +1,4 @@
-export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota" | "bugatti";
+export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota" | "bugatti" | "mclaren";
 
 export type FinishId = "gloss" | "satin" | "matte" | "metallic" | "carbon";
 
@@ -107,6 +107,8 @@ export interface CarDefinition {
   rideHeight: boolean;
   defaultPaints: Record<string, string>;
   defaultFinish: FinishId;
+  /** Finish choices shown in the configurator. Defaults to every finish. */
+  finishes?: FinishId[];
   doors?: CarDoor[];
   /** Played when either door orb is clicked to enter the cabin. */
   doorSound?: string;
