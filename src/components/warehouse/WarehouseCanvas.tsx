@@ -34,7 +34,7 @@ const garageBuilds = new Map(garageCars.map((car) => [car.slug, createDefaultBui
 const row = [
   { slug: "ferrari-sf25", empty: false, reserved: false, shift: 2.1 },
   { slug: "bugatti-chiron", empty: false, reserved: false, shift: 0 },
-  { slug: "porsche-gt4", empty: false, reserved: false, shift: -2.1 },
+  { slug: "audi-r8-lms", empty: false, reserved: false, shift: -2.1 },
   { slug: "lamborghini-revuelto", empty: false, reserved: false, shift: -4.2 },
 ].map((bay, index, list) => {
   const x = LINE.x + (index - (list.length - 1) / 2) * BAY_SPACING + bay.shift;
@@ -116,14 +116,24 @@ const bays = [
     rotation: FACE,
     focus: backRowFocus,
   },
-  ...[caymanBay, revueltoBay].map((bay, index) => ({
-    slug: `row-3-${index + 3}`,
-    empty: true,
-    reserved: true,
+  {
+    slug: "porsche-gt4",
+    empty: false,
+    reserved: false,
     shift: 0,
-    position: [bay.position[0], 0, backZ] as [number, number, number],
+    position: [caymanBay.position[0], 0, backZ] as [number, number, number],
     rotation: FACE,
-  })),
+    focus: backRowFocus,
+  },
+  {
+    slug: "red-bull-rb18",
+    empty: false,
+    reserved: false,
+    shift: 0,
+    position: [revueltoBay.position[0], 0, backZ] as [number, number, number],
+    rotation: FACE,
+    focus: backRowFocus,
+  },
 ];
 
 const lookTargets = Object.fromEntries(

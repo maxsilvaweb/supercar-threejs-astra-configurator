@@ -264,7 +264,7 @@ function SectionBody({ car, section }: { car: CarDefinition; section: SectionId 
 export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?: boolean }) {
   const state = useConfig();
   const [open, setOpen] = useState(false);
-  const [section, setSection] = useState<SectionId>("paint");
+  const [section, setSection] = useState<SectionId>(car.paintGroups.length > 0 ? "paint" : "spec");
 
   useEffect(() => {
     preloadSound(IMPACT_DRILL);
@@ -392,6 +392,7 @@ export function Tuner({ car, revealed = true }: { car: CarDefinition; revealed?:
 
         <section className={cn("grid gap-4", state.applying && "pointer-events-none opacity-55")}>
           {sections
+            .filter((item) => (item.id !== "paint" && item.id !== "finish") || car.paintGroups.length > 0)
             .filter((item) => item.id !== "options" || car.aeroParts.length > 0)
             .filter((item) => item.id !== "wheels" || car.hideWhenAftermarket)
             .filter((item) => item.id !== "spec" || car.spec)

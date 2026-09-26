@@ -112,13 +112,14 @@ export function cabinView(root: Object3D, side: CabinSide = "left", car?: CarDef
     const headAbove = Math.max(carSize.y * 0.04, 0.1);
 
     const lift = car?.cabin?.seatLift ?? 0;
+    const back = car?.cabin?.seatBack ?? 0;
     if (side === "right") {
-      eye.set(wheelCenter.x, wheelCenter.y + headAbove + lift, wheelCenter.z - behind);
+      eye.set(wheelCenter.x, wheelCenter.y + headAbove + lift, wheelCenter.z - behind - back);
       look.copy(wheelCenter);
       look.y += lift;
     } else {
       const seatX = carCenter.x - Math.abs(wheelCenter.x - carCenter.x);
-      eye.set(seatX, wheelCenter.y + headAbove + lift, wheelCenter.z - behind);
+      eye.set(seatX, wheelCenter.y + headAbove + lift, wheelCenter.z - behind - back);
       look.set(seatX, wheelCenter.y + headAbove * 0.85 + lift, wheelCenter.z + carSize.z * 0.12);
     }
     return { position: eye.toArray(), target: look.toArray() };

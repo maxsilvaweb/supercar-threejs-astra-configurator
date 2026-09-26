@@ -931,6 +931,98 @@ function applyMappedFinish(
   return next;
 }
 
+const RB18_RECOLOR_GLSL = /* glsl */ `
+uniform vec3 uPaint;
+uniform float uRecolor;
+
+vec3 rb18Rgb2Hsl(vec3 color) {
+  float maxc = max(max(color.r, color.g), color.b);
+  float minc = min(min(color.r, color.g), color.b);
+  float l = (maxc + minc) * 0.5;
+  float d = maxc - minc;
+  float s = 0.0;
+  float h = 0.0;
+  if (d > 1e-5) {
+    s = l > 0.5 ? d / (2.0 - maxc - minc) : d / (maxc + minc);
+    if (maxc == color.r) h = mod((color.g - color.b) / d + (color.g < color.b ? 6.0 : 0.0), 6.0) / 6.0;
+    else if (maxc == color.g) h = ((color.b - color.r) / d + 2.0) / 6.0;
+    else h = ((color.r - color.g) / d + 4.0) / 6.0;
+  }
+  return vec3(h, s, l);
+}
+
+vec3 rb18ToSrgb(vec3 c) {
+  return mix(pow(max(c, vec3(0.0)), vec3(0.41666)) * 1.055 - 0.055, c * 12.92, step(c, vec3(0.0031308)));
+}
+
+vec3 rb18ToLinear(vec3 c) {
+  return mix(pow(c * 0.9478672986 + 0.0521327014, vec3(2.4)), c * 0.0773993808, step(c, vec3(0.04045)));
+}
+
+vec3 rb18Recolor(vec3 linearRgb) {
+  vec3 srgb = rb18ToSrgb(linearRgb);
+  vec3 hsl = rb18Rgb2Hsl(srgb);
+  bool decal = hsl.y > 0.34 || hsl.z > 0.58 || hsl.z < 0.12;
+  if (uRecolor < 0.5 || decal) return linearRgb;
+  float luma = dot(srgb, vec3(0.2126, 0.7152, 0.0722));
+  float scale = clamp(max(luma, 0.12) / 0.22, 0.55, 1.85);
+  vec3 paintSrgb = rb18ToSrgb(uPaint);
+  return rb18ToLinear(clamp(paintSrgb * scale, vec3(0.0), vec3(1.0)));
+}
+`;
+
+function attachRb18Recolor(
+  material: MeshStandardMaterial | MeshPhysicalMaterial,
+  color: string,
+  enabled: boolean,
+) {
+  const uPaint = { value: new Color(color) };
+  const uRecolor = { value: enabled ? 1 : 0 };
+  material.userData.rb18Paint = uPaint;
+  material.userData.rb18Recolor = uRecolor;
+  material.customProgramCacheKey = () => 'rb18-livery';
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uPaint = uPaint;
+    shader.uniforms.uRecolor = uRecolor;
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>\n${RB18_RECOLOR_GLSL}`)
+      .replace(
+        '#include <map_fragment>',
+        /* glsl */ `
+#ifdef USE_MAP
+	vec4 sampledDiffuseColor = texture2D( map, vMapUv );
+	#ifdef DECODE_VIDEO_TEXTURE
+		sampledDiffuseColor = sRGBTransferEOTF( sampledDiffuseColor );
+	#endif
+	sampledDiffuseColor.rgb = rb18Recolor(sampledDiffuseColor.rgb);
+	diffuseColor *= sampledDiffuseColor;
+#endif
+`,
+      );
+  };
+  material.needsUpdate = true;
+}
+
+function paintRb18Livery(
+  material: Material,
+  color: string,
+  finish: FinishId,
+  defaultColor: string,
+) {
+  const paintColor = finish === 'carbon' ? '#1a1a1a' : color;
+  const next = applyMappedFinish(material, paintColor, finish);
+  if (
+    !(next instanceof MeshStandardMaterial) &&
+    !(next instanceof MeshPhysicalMaterial)
+  )
+    return next;
+  const skipRecolor =
+    finish !== 'carbon' &&
+    paintColor.toLowerCase() === defaultColor.toLowerCase();
+  attachRb18Recolor(next, paintColor, !skipRecolor);
+  return next;
+}
+
 function paintSf25Livery(
   material: Material,
   color: string,
@@ -1143,6 +1235,14 @@ export function applyCarBuild(
       ) {
         return createPorscheCabinMaterial();
       }
+      if (car.slug === 'audi-r8-lms') {
+        if (hasMaps(material)) return polishMapped(material);
+        if (isGlass(matName)) return createGlassMaterial(matName);
+        return material;
+      }
+      if (car.slug === 'red-bull-rb18' && isGlass(mesh.name)) {
+        return createGlassMaterial(mesh.name);
+      }
       if (isGlass(matName)) {
         return createGlassMaterial(matName);
       }
@@ -1169,6 +1269,14 @@ export function applyCarBuild(
             build.finish,
             car.defaultPaints[group.id] || '#FF2800',
             /FrontWing|Nose|RearWing|RearFlap|DRS/i.test(mesh.name),
+          );
+        }
+        if (car.slug === 'red-bull-rb18' && hasMaps(material)) {
+          return paintRb18Livery(
+            material,
+            color,
+            build.finish,
+            car.defaultPaints[group.id] || '#10233F',
           );
         }
         if (

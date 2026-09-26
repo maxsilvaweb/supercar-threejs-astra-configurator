@@ -1,4 +1,4 @@
-export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota" | "bugatti" | "mclaren";
+export type Brand = "ferrari" | "porsche" | "lamborghini" | "chevrolet" | "aston-martin" | "toyota" | "bugatti" | "mclaren" | "audi" | "honda";
 
 export type FinishId = "gloss" | "satin" | "matte" | "metallic" | "carbon";
 
@@ -33,6 +33,8 @@ export interface CarCabin {
   wheelDetect?: string;
   /** Raise the seated camera, in metres, without changing where it looks. */
   seatLift?: number;
+  /** Move the seated camera back from the wheel, in metres. */
+  seatBack?: number;
   /** `direct` skips the right-hand door pan (open-cockpit cars). */
   entry?: "door" | "direct";
 }

@@ -1,5 +1,6 @@
 import type { CarDefinition } from "../lib/schema";
 import { astonMartinValhalla } from "./aston-martin-valhalla";
+import { audiR8Lms } from "./audi-r8-lms";
 import { chevroletZr1 } from "./chevrolet-zr1";
 import { ferrariEnzo } from "./ferrari-enzo";
 import { ferrariSf25 } from "./ferrari-sf25";
@@ -7,10 +8,11 @@ import { lamborghiniRevuelto } from "./lamborghini-revuelto";
 import { lamborghiniTemerario } from "./lamborghini-temerario";
 import { mclaren765lt } from "./mclaren-765lt";
 import { porscheGt4 } from "./porsche-gt4";
+import { redBullRb18 } from "./red-bull-rb18";
 import { toyotaSupraMk5 } from "./toyota-supra-mk5";
 import { bugattiChiron } from "./bugatti-chiron";
 
-const cars: CarDefinition[] = [ferrariSf25, bugattiChiron, porscheGt4, lamborghiniRevuelto, chevroletZr1, astonMartinValhalla, toyotaSupraMk5, ferrariEnzo, lamborghiniTemerario, mclaren765lt];
+const cars: CarDefinition[] = [ferrariSf25, bugattiChiron, audiR8Lms, lamborghiniRevuelto, chevroletZr1, astonMartinValhalla, toyotaSupraMk5, ferrariEnzo, lamborghiniTemerario, mclaren765lt, porscheGt4, redBullRb18];
 
 export function listCars() {
   return cars.filter((car) => !car.hidden);

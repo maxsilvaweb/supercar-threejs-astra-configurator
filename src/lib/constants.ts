@@ -42,6 +42,8 @@ const previewVersion: Record<string, number> = {
   "aston-martin-valhalla": 2,
   "toyota-supra-mk5": 2,
   "bugatti-chiron": 2,
+  "audi-r8-lms": 2,
+  "red-bull-rb18": 1,
   "studio-garage": 1,
 };
 
@@ -53,6 +55,8 @@ const backdropVersion: Record<string, number> = {
   "lamborghini-revuelto": 2,
   "bugatti-chiron": 3,
   "mclaren-765lt": 2,
+  "audi-r8-lms": 2,
+  "red-bull-rb18": 2,
 };
 
 export function carBackdropUrl(slug: string) {
@@ -79,6 +83,8 @@ export const PORSCHE_GT4_MODEL = "/models/porsche-gt4/porsche-gt4.glb?v=2";
 export const LAMBORGHINI_REVUELTO_MODEL = "/models/lamborghini-revuelto/lamborghini-revuelto.glb?v=2";
 export const LAMBORGHINI_TEMERARIO_MODEL = "/models/lamborghini-temerario/lamborghini-temerario.glb?v=1";
 export const MCLAREN_765LT_MODEL = "/models/mclaren-765lt/mclaren-765lt.glb?v=2";
+export const AUDI_R8_LMS_MODEL = "/models/audi-r8-lms/audi-r8-lms.glb?v=1";
+export const RED_BULL_RB18_MODEL = "/models/red-bull-rb18/red-bull-rb18.glb?v=1";
 export const LAMBORGHINI_REVUELTO_CLUSTER = "/ui/dials/lamborghini-revuelto.jpg";
 export const PORSCHE_GT4_CLUSTER = "/ui/dials/porsche-gt4.jpg?v=3";
 export const PORSCHE_GT4_BADGE = "/ui/brands/porsche-crest.png";
