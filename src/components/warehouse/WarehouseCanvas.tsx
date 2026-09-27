@@ -1,4 +1,4 @@
-import { ContactShadows, Environment, MeshReflectorMaterial, PerspectiveCamera, useCursor } from "@react-three/drei";
+import { ContactShadows, Environment, PerspectiveCamera, useCursor } from "@react-three/drei";
 import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Outline, Select, Selection, Vignette } from "@react-three/postprocessing";
 import { Pointer, Wrench } from "lucide-react";
@@ -361,26 +361,35 @@ function BayHotspot({
   );
 }
 
-function GarageFloor({ cinematic }: { cinematic: boolean }) {
+function GarageFloor() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.004, 0]} raycast={skipRaycast}>
       <planeGeometry args={[28, 26]} />
-      {cinematic ? (
-        <MeshReflectorMaterial
-          resolution={512}
-          blur={[200, 80]}
-          mixBlur={0.65}
-          mixStrength={28}
-          mirror={0.45}
-          color="#12141a"
-          metalness={0.55}
-          roughness={0.35}
-        />
-      ) : (
-        <meshStandardMaterial color="#1a1b1f" metalness={0.32} roughness={0.55} />
-      )}
+      <meshStandardMaterial color="#14161c" metalness={0.48} roughness={0.42} />
     </mesh>
   );
+}
+
+function useSettledSlug(slug?: string, delayMs = 180) {
+  const [settled, setSettled] = useState(slug);
+  useEffect(() => {
+    if (!slug) {
+      setSettled(undefined);
+      return;
+    }
+    const id = window.setTimeout(() => setSettled(slug), delayMs);
+    return () => window.clearTimeout(id);
+  }, [delayMs, slug]);
+  return settled;
+}
+
+function useDebouncedPrefetch() {
+  const timer = useRef(0);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  return (car: Parameters<typeof prefetchCar>[0]) => {
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => prefetchCar(car), 320);
+  };
 }
 
 function ParkedCars({
@@ -394,6 +403,9 @@ function ParkedCars({
   hover: { keep: (slug: string) => void; release: (related?: EventTarget | null) => void };
   onSelect: (slug: string) => void;
 }) {
+  const orbSlug = useSettledSlug(hovered || pointed);
+  const prefetch = useDebouncedPrefetch();
+
   return (
     <>
       {bays.map((bay) => {
@@ -407,7 +419,7 @@ function ParkedCars({
                 <CarModel car={car} build={build} />
               </Select>
             ) : null}
-            {active && car && !bay.empty ? (
+            {orbSlug === bay.slug && car && !bay.empty ? (
               <ConfigureOrb
                 slug={bay.slug}
                 onSelect={onSelect}
@@ -423,7 +435,7 @@ function ParkedCars({
                 slug={bay.slug}
                 onEnter={() => {
                   hover.keep(bay.slug);
-                  prefetchCar(car);
+                  prefetch(car);
                 }}
                 onSelect={onSelect}
               />
@@ -493,25 +505,24 @@ function Scene({
           blur={cinematic ? 0.45 : 0.7}
           resolution={128}
         />
-        {cinematic ? <GarageFloor cinematic /> : null}
+        {cinematic ? <GarageFloor /> : null}
         <WarehouseRoom cinematic={cinematic} level={lights} />
         <ParkedCars hovered={hovered} pointed={pointed} hover={hover} onSelect={onSelect} />
       </Suspense>
       {!cinematic ? (
-        <ContactShadows frames={1} resolution={256} position={[0, 0.01, 0]} opacity={0.4} scale={18} blur={2} far={5} />
+        <ContactShadows frames={1} resolution={128} position={[0, 0.01, 0]} opacity={0.35} scale={18} blur={1.6} far={5} />
       ) : null}
       <DriftCamera focused={focused} />
-      <EffectComposer disableNormalPass multisampling={0} autoClear={false}>
-        <Bloom intensity={(cinematic ? 0.38 : 0.28) * glow} luminanceThreshold={cinematic ? 0.55 : 0.7} mipmapBlur />
+      <EffectComposer disableNormalPass multisampling={0} autoClear={false} enabled>
+        <Bloom intensity={(cinematic ? 0.28 : 0.2) * glow} luminanceThreshold={cinematic ? 0.62 : 0.78} mipmapBlur />
         <Outline
-          edgeStrength={highlighted ? 5.4 : 0}
-          pulseSpeed={highlighted ? 0.7 : 0}
+          edgeStrength={highlighted ? 3.6 : 0}
+          pulseSpeed={0}
           visibleEdgeColor={accent.outline}
           hiddenEdgeColor={accent.outlineDim}
-          blur
-          xRay
+          xRay={false}
         />
-        <Vignette darkness={cinematic ? 0.58 : 0.38} offset={0.32} />
+        <Vignette darkness={cinematic ? 0.5 : 0.34} offset={0.34} />
       </EffectComposer>
     </Selection>
   );
@@ -544,8 +555,8 @@ export function WarehouseCanvas({
     >
       <Canvas
         className="h-full w-full touch-none"
-        dpr={[1, 2]}
-        gl={{ antialias: true, powerPreference: "high-performance", stencil: false }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, powerPreference: "high-performance", stencil: false, depth: true }}
         style={{ touchAction: "none" }}
         events={(store) => ({
           ...events(store),

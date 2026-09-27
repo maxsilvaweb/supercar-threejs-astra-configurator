@@ -56,11 +56,17 @@ export function GarageApp() {
     window.location.href = `/configure/${car.slug}`;
   };
 
+  const prefetchTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(prefetchTimer.current), []);
+
   const hover = (slug?: string) => {
     const car = slug ? cars.find((entry) => entry.slug === slug) : undefined;
     if (slug && car?.comingSoon) return;
     setHovered(slug);
-    if (car && !car.comingSoon) prefetchCar(car);
+    window.clearTimeout(prefetchTimer.current);
+    if (car && !car.comingSoon) {
+      prefetchTimer.current = window.setTimeout(() => prefetchCar(car), 320);
+    }
   };
 
   if (!desktop) {

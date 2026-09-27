@@ -2,7 +2,7 @@ import { DoorOpen, Pointer } from "lucide-react";
 import { useEffect } from "react";
 import type { Group } from "three";
 import { doorHotspotPoint } from "../../lib/hotspot";
-import { QUICK_WOOSH } from "../../lib/constants";
+import { OPENING_DOOR, QUICK_WOOSH } from "../../lib/constants";
 import { playOneShotSound, preloadSound } from "../../lib/play-one-shot-sound";
 import type { CarDoor, CarDefinition } from "../../lib/schema";
 import { useConfig } from "../../lib/store";
@@ -18,11 +18,12 @@ export function DoorHotspots({
 }) {
   const doors = car.doors;
   if (!doors?.length) return null;
+  const sound = car.cabin?.entry === "direct" ? undefined : (car.doorSound ?? OPENING_DOOR);
 
   return (
     <>
       {doors.map((door) => (
-        <DoorMarker key={`${car.slug}-${door.id}`} door={door} sound={car.doorSound} carRef={carRef} />
+        <DoorMarker key={`${car.slug}-${door.id}`} door={door} sound={sound} carRef={carRef} />
       ))}
     </>
   );

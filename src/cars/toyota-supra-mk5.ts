@@ -61,12 +61,12 @@ export const toyotaSupraMk5 = defineCar({
   ],
   cabin: {
     right: {
-      eye: { x: 0.58, y: 0.46, z: 0.46 },
-      look: { x: 0.58, y: 0.48, z: 0.78 },
+      eye: { x: 0.58, y: 0.63, z: 0.38 },
+      look: { x: 0.58, y: 0.6, z: 0.84 },
     },
     left: {
-      eye: { x: 0.42, y: 0.46, z: 0.46 },
-      look: { x: 0.42, y: 0.48, z: 0.78 },
+      eye: { x: 0.42, y: 0.63, z: 0.38 },
+      look: { x: 0.42, y: 0.6, z: 0.84 },
     },
   },
 });

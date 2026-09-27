@@ -370,10 +370,13 @@
 .btn-glossy[data-active="true"],
 .btn-glossy[aria-pressed="true"] {
   background-color: var(--studio-accent, #cfff00);
-  background-image:
-    linear-gradient(180deg, var(--studio-accent-hi, #e8ff6a) 0%, var(--studio-accent, #cfff00) 45%, var(--studio-accent-lo, #6d8a00) 100%),
-    url("/ui/carbon.png");
-  background-blend-mode: soft-light, multiply;
+  background-image: linear-gradient(
+    180deg,
+    var(--studio-accent-hi, #e8ff6a) 0%,
+    var(--studio-accent, #cfff00) 45%,
+    var(--studio-accent-lo, #6d8a00) 100%
+  );
+  background-blend-mode: normal;
   color: var(--studio-accent-ink, #111);
   border-color: var(--studio-accent-edge, rgb(90 110 0 / 0.7));
 }
@@ -1076,4 +1079,30 @@
 .apply-bar {
   width: 42%;
   animation: apply-bar 1.15s ease-in-out infinite;
+}
+
+.car-switcher {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.car-switcher::-webkit-scrollbar {
+  display: none;
+  height: 0;
+}
+
+.car-switcher-track {
+  margin-top: 0.55rem;
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.car-switcher-thumb {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--studio-accent, #cfff00);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }

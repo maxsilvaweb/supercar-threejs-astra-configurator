@@ -21,7 +21,7 @@ export const GARAGE_VENT_VOLUME = 0.4;
 export const LOW_ENGINE_NOISE = "/sounds/low-engine-noise.wav";
 export const LOW_ENGINE_VOLUME = 0.55;
 
-export const FERRARI_ENZO_DOOR_SOUND = "/sounds/opening-door.wav";
+export const OPENING_DOOR = "/sounds/opening-door.wav";
 
 /** Short clips the interface plays on click. These stay ahead of the car downloads. */
 export const INTERFACE_SOUNDS = [MENU_CLICK, QUICK_WOOSH, STUDIO_GARAGE_ENTRY];
@@ -32,7 +32,7 @@ export const STUDIO_SOUNDS = [
   SPRAY_PAINT,
   IMPACT_DRILL,
   GARAGE_VENT_URL,
-  FERRARI_ENZO_DOOR_SOUND,
+  OPENING_DOOR,
   LOW_ENGINE_NOISE,
 ];
 

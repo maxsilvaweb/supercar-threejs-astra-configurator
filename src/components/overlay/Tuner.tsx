@@ -263,6 +263,21 @@ function SectionBody({ car, section }: { car: CarDefinition; section: SectionId 
   );
 }
 
+const THUMB_WIDTH = 28;
+
+const scrollSpan = (el: HTMLElement, track: HTMLElement) => ({
+  hidden: el.scrollWidth - el.clientWidth,
+  travel: Math.max(track.clientWidth - THUMB_WIDTH, 0),
+});
+
+const canScroll = (hidden: number, travel: number) => hidden > 0 && travel > 0;
+
+const thumbAt = (scrollLeft: number, hidden: number, travel: number) =>
+  canScroll(hidden, travel) ? (scrollLeft / hidden) * travel : 0;
+
+const scrollAt = (left: number, hidden: number, travel: number) =>
+  canScroll(hidden, travel) ? (left / travel) * hidden : 0;
+
 function CarRoster({
   car,
   onSelectCar,
@@ -271,35 +286,74 @@ function CarRoster({
   onSelectCar: (slug: string) => void;
 }) {
   const currentRef = useRef<HTMLButtonElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
+
+  const metrics = () => {
+    const el = scrollerRef.current;
+    const track = trackRef.current;
+    if (!el || !track) return null;
+    return { el, track, ...scrollSpan(el, track) };
+  };
+
+  const syncThumb = () => {
+    const next = metrics();
+    const thumb = thumbRef.current;
+    if (!next || !thumb) return;
+    thumb.style.transform = `translate3d(${thumbAt(next.el.scrollLeft, next.hidden, next.travel)}px, 0, 0)`;
+  };
 
   useEffect(() => {
     const node = currentRef.current;
-    const scroller = node?.parentElement;
+    const scroller = scrollerRef.current;
     if (!node || !scroller) return;
     const left = node.offsetLeft - (scroller.clientWidth - node.offsetWidth) / 2;
     scroller.scrollTo({ left: Math.max(0, left) });
+    syncThumb();
   }, [car.slug]);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    syncThumb();
+    const observer = new ResizeObserver(syncThumb);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToThumb = (left: number) => {
+    const next = metrics();
+    if (!next) return;
+    next.el.scrollLeft = scrollAt(left, next.hidden, next.travel);
+  };
 
   return (
     <div className="mb-6">
       <p className="mb-2 text-xs font-medium tracking-[0.16em] text-white uppercase">Switch car</p>
-      <div className="flex items-start gap-2 overflow-x-auto overscroll-x-contain px-0.5 py-1">
+      <div
+        ref={scrollerRef}
+        className="car-switcher flex items-start gap-2 overscroll-x-contain px-1 py-1"
+        onScroll={syncThumb}
+      >
         {listConfigurableCars().map((entry) => {
           const selected = entry.slug === car.slug;
+          const label = `Switch to ${entry.name}`;
+          const warm = () => prefetchCar(entry);
           return (
             <button
               key={entry.slug}
               ref={selected ? currentRef : undefined}
               type="button"
               aria-pressed={selected}
-              aria-label={`Switch to ${entry.name}`}
-              title={`Switch to ${entry.name}`}
+              aria-label={label}
+              title={label}
               className={cn(
                 "group w-36 shrink-0 overflow-hidden rounded-md bg-white/5 text-left ring-2 transition-colors",
                 selected ? "ring-primary" : "ring-white/20 hover:ring-primary",
               )}
-              onMouseEnter={() => prefetchCar(entry)}
-              onFocus={() => prefetchCar(entry)}
+              onMouseEnter={warm}
+              onFocus={warm}
               onClick={() => onSelectCar(entry.slug)}
             >
               <img
@@ -316,6 +370,42 @@ function CarRoster({
             </button>
           );
         })}
+      </div>
+      <div
+        ref={trackRef}
+        className="car-switcher-track"
+        aria-hidden
+        onPointerDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          const track = trackRef.current;
+          if (!track) return;
+          const x = event.clientX - track.getBoundingClientRect().left - THUMB_WIDTH / 2;
+          scrollToThumb(x);
+        }}
+      >
+        <div
+          ref={thumbRef}
+          className="car-switcher-thumb"
+          style={{ width: THUMB_WIDTH }}
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const originX = event.clientX;
+            const originScroll = scrollerRef.current?.scrollLeft ?? 0;
+            const move = (pointer: PointerEvent) => {
+              const next = metrics();
+              if (!next) return;
+              const originLeft = thumbAt(originScroll, next.hidden, next.travel);
+              scrollToThumb(originLeft + pointer.clientX - originX);
+            };
+            const up = () => {
+              window.removeEventListener("pointermove", move);
+              window.removeEventListener("pointerup", up);
+            };
+            window.addEventListener("pointermove", move);
+            window.addEventListener("pointerup", up);
+          }}
+        />
       </div>
     </div>
   );
