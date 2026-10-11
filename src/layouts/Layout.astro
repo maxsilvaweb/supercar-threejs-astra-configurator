@@ -3,9 +3,18 @@ import "../styles/global.css";
 
 interface Props {
   title: string;
+  description: string;
+  image?: string;
+  jsonLd?: unknown;
 }
 
-const { title } = Astro.props;
+const { title, description, image = "/ui/previews/studio-garage.jpg", jsonLd } = Astro.props;
+const origin = Astro.site ?? new URL("https://supercar-threejs-astra-configurator.vercel.app");
+const canonical = new URL(Astro.url.pathname, origin).href;
+const imageUrl = new URL(image, origin).href;
+const json = jsonLd
+  ? JSON.stringify(jsonLd).replace(/</g, "\\u003c")
+  : "";
 ---
 
 <!doctype html>
@@ -13,11 +22,28 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="silvaweb studio" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="960" />
+    <meta property="og:image:height" content="589" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="/sounds/menu-click.wav" as="audio" type="audio/wav" crossorigin="anonymous" fetchpriority="high" />
     <link rel="preload" href="/sounds/quick-woosh.mp3" as="audio" type="audio/mpeg" crossorigin="anonymous" fetchpriority="high" />
     <link rel="preload" href="/sounds/studio-garage-entry.mp3" as="audio" type="audio/mpeg" crossorigin="anonymous" fetchpriority="high" />
     <title>{title}</title>
+    {json ? <script type="application/ld+json" set:html={json} /> : null}
     <slot name="head" />
   </head>
   <body class="dark">

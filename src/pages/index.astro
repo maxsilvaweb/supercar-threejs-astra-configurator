@@ -1,8 +1,41 @@
 ---
 import { GarageApp } from "../components/overlay/GarageApp";
+import { brandLabel } from "../components/overlay/BrandMark";
+import { listCars } from "../cars";
 import Layout from "../layouts/Layout.astro";
+import {
+  DEFAULT_OG_IMAGE,
+  WAREHOUSE_DESCRIPTION,
+  WAREHOUSE_TITLE,
+  warehouseJsonLd,
+} from "../lib/seo";
+
+const cars = listCars();
 ---
 
-<Layout title="silvaweb studio">
+<Layout
+  title={WAREHOUSE_TITLE}
+  description={WAREHOUSE_DESCRIPTION}
+  image={DEFAULT_OG_IMAGE}
+  jsonLd={warehouseJsonLd(cars)}
+>
+  <section class="sr-only" aria-hidden="true">
+    <h1>silvaweb studio</h1>
+    <p>{WAREHOUSE_DESCRIPTION}</p>
+    <ul>
+      {cars.map((car) => (
+        <li>
+          {car.comingSoon ? (
+            `${brandLabel[car.brand]} ${car.name} — coming soon`
+          ) : (
+            <a href={`/configure/${car.slug}`}>
+              {brandLabel[car.brand]} {car.name}
+              {car.year ? ` (${car.year})` : ""}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </section>
   <GarageApp client:only="react" />
 </Layout>

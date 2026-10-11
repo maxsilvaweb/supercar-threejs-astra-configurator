@@ -1,7 +1,9 @@
 ---
 import { ConfigureApp } from "../../components/ConfigureApp";
+import { brandLabel } from "../../components/overlay/BrandMark";
 import { getCar, listConfigurableCars } from "../../cars";
 import { carBackdropUrl, carPreviewUrl, CONFIG_GARAGE_MODEL, GARAGE_VENT_URL, RIM_MODEL } from "../../lib/constants";
+import { carJsonLd, carPageDescription, carPageTitle } from "../../lib/seo";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -10,9 +12,16 @@ export function getStaticPaths() {
 
 const { slug } = Astro.params;
 const car = slug ? getCar(slug) : undefined;
+const title = car ? carPageTitle(car) : "Configure · silvaweb";
+const description = car ? carPageDescription(car) : "Configure a car in 3D at silvaweb studio.";
 ---
 
-<Layout title={`${car?.name || "Configure"} · silvaweb`}>
+<Layout
+  title={title}
+  description={description}
+  image={car ? carPreviewUrl(car.slug) : undefined}
+  jsonLd={car ? carJsonLd(car) : undefined}
+>
   {car ? (
     <link slot="head" rel="preload" href={carBackdropUrl(car.slug)} as="image" fetchpriority="high" media="(min-width: 768px)" />
   ) : null}
@@ -25,5 +34,37 @@ const car = slug ? getCar(slug) : undefined;
   <link slot="head" rel="preload" href={CONFIG_GARAGE_MODEL} as="fetch" crossorigin media="(min-width: 768px)" />
   <link slot="head" rel="preload" href={RIM_MODEL} as="fetch" crossorigin media="(min-width: 768px)" />
   <link slot="head" rel="preload" href={GARAGE_VENT_URL} as="fetch" crossorigin media="(min-width: 768px)" />
+  {car ? (
+    <article class="sr-only" aria-hidden="true">
+      <h1>
+        {brandLabel[car.brand]} {car.name}
+      </h1>
+      {car.year ? <p>{car.year}</p> : null}
+      {car.tagline ? <p>{car.tagline}</p> : null}
+      {car.history ? (
+        <section>
+          <h2>{car.history.headline}</h2>
+          {car.history.kicker ? <p>{car.history.kicker}</p> : null}
+          <p>{car.history.body}</p>
+        </section>
+      ) : null}
+      {car.spec ? (
+        <section>
+          <h2>Specification</h2>
+          <dl>
+            {car.spec.details.map((fact) => (
+              <>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </>
+            ))}
+          </dl>
+        </section>
+      ) : null}
+      <p>
+        <a href="/">Back to the warehouse</a>
+      </p>
+    </article>
+  ) : null}
   <ConfigureApp client:only="react" slug={slug || ""} />
 </Layout>
