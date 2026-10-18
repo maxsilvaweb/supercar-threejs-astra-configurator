@@ -1,5 +1,6 @@
 ---
 import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import "../styles/global.css";
 
 interface Props {
@@ -50,5 +51,6 @@ const json = jsonLd
   <body class="dark">
     <slot />
     <Analytics />
+    <SpeedInsights />
   </body>
 </html>
